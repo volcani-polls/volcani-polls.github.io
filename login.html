@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>Volcani Polls - התחברות</title>
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <div class="brand">
+      <div class="brand-mark">V</div>
+      <div>
+        <h1>Volcani Polls</h1>
+        <p>מערכת סקרי הרצאות</p>
+      </div>
+    </div>
+
+    <form id="loginForm" class="form">
+      <label>
+        כתובת מייל
+        <input id="email" type="email" autocomplete="email" placeholder="username@volcani.agri.gov.il" required>
+      </label>
+      <label>
+        סיסמה
+        <input id="password" type="password" autocomplete="current-password" required>
+      </label>
+      <button id="loginBtn" class="btn primary full" type="submit">התחברות</button>
+    </form>
+
+    <div id="message" class="message" hidden></div>
+
+    <p class="auth-switch">אין לך משתמש? <a href="register.html">להרשמה</a></p>
+    <p class="tiny-note">הגישה מותרת רק למיילים שמסתיימים ב־@volcani.agri.gov.il</p>
+  </main>
+  <script type="module" src="js/auth.js"></script>
+</body>
+</html>

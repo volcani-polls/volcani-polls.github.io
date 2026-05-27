@@ -1,0 +1,30 @@
+{
+  "config": {
+    "ownerEmail": "yehudah@volcani.agri.gov.il",
+    "adminEmailsCsv": "yehudah@volcani.agri.gov.il,admin2@volcani.agri.gov.il,admin3@volcani.agri.gov.il"
+  },
+  "lectures": {
+    "demo_lecture": {
+      "title": "הרצאת דוגמה",
+      "author": "ד״ר ישראל ישראלי",
+      "isOpen": false,
+      "order": 1,
+      "createdAt": 1710000000000,
+      "updatedAt": 1710000000000,
+      "questions": {
+        "q_001": {
+          "text": "עד כמה ההרצאה הייתה ברורה?",
+          "order": 1
+        },
+        "q_002": {
+          "text": "עד כמה הנושא היה רלוונטי עבורך?",
+          "order": 2
+        },
+        "q_003": {
+          "text": "עד כמה המרצה העביר/ה את התוכן בצורה טובה?",
+          "order": 3
+        }
+      }
+    }
+  }
+}

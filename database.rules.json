@@ -1,0 +1,129 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "config": {
+      ".read": "auth != null && auth.token.email != null && auth.token.email.endsWith('@volcani.agri.gov.il')",
+      ".write": "auth != null && auth.token.email != null && auth.token.email.endsWith('@volcani.agri.gov.il') && (auth.token.email === 'yehudah@volcani.agri.gov.il' || auth.token.email === root.child('config').child('ownerEmail').val())",
+      "ownerEmail": {
+        ".validate": "newData.isString() && newData.val().endsWith('@volcani.agri.gov.il')"
+      },
+      "adminEmailsCsv": {
+        ".validate": "newData.isString() && (newData.val() === '' || newData.val().matches(/^([A-Za-z0-9._%+-]+@volcani\\.agri\\.gov\\.il)(,[A-Za-z0-9._%+-]+@volcani\\.agri\\.gov\\.il)*$/))"
+      },
+      "$other": {
+        ".validate": false
+      }
+    },
+    "admins": {
+      ".read": "auth != null && auth.token.email != null && auth.token.email.endsWith('@volcani.agri.gov.il') && (auth.token.email === 'yehudah@volcani.agri.gov.il' || auth.token.email === root.child('config').child('ownerEmail').val() || (root.child('config').child('adminEmailsCsv').isString() && (',' + root.child('config').child('adminEmailsCsv').val() + ',').contains(',' + auth.token.email + ',')))",
+      "$uid": {
+        ".read": "auth != null && auth.token.email != null && auth.token.email.endsWith('@volcani.agri.gov.il') && ($uid === auth.uid || auth.token.email === 'yehudah@volcani.agri.gov.il' || auth.token.email === root.child('config').child('ownerEmail').val() || (root.child('config').child('adminEmailsCsv').isString() && (',' + root.child('config').child('adminEmailsCsv').val() + ',').contains(',' + auth.token.email + ',')))",
+        ".write": "auth != null && auth.token.email != null && auth.token.email.endsWith('@volcani.agri.gov.il') && (auth.token.email === 'yehudah@volcani.agri.gov.il' || auth.token.email === root.child('config').child('ownerEmail').val())",
+        ".validate": "newData.hasChildren(['email', 'active', 'createdAt'])",
+        "email": {
+          ".validate": "newData.isString() && newData.val().endsWith('@volcani.agri.gov.il')"
+        },
+        "active": {
+          ".validate": "newData.isBoolean()"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber() && newData.val() <= now"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "users": {
+      ".read": "auth != null && auth.token.email != null && auth.token.email.endsWith('@volcani.agri.gov.il') && (auth.token.email === 'yehudah@volcani.agri.gov.il' || auth.token.email === root.child('config').child('ownerEmail').val() || (root.child('config').child('adminEmailsCsv').isString() && (',' + root.child('config').child('adminEmailsCsv').val() + ',').contains(',' + auth.token.email + ',')))",
+      ".indexOn": [
+        "email"
+      ],
+      "$uid": {
+        ".read": "auth != null && auth.token.email != null && auth.token.email.endsWith('@volcani.agri.gov.il') && ($uid === auth.uid || auth.token.email === 'yehudah@volcani.agri.gov.il' || auth.token.email === root.child('config').child('ownerEmail').val() || (root.child('config').child('adminEmailsCsv').isString() && (',' + root.child('config').child('adminEmailsCsv').val() + ',').contains(',' + auth.token.email + ',')))",
+        ".write": "auth != null && auth.token.email != null && auth.token.email.endsWith('@volcani.agri.gov.il') && $uid === auth.uid",
+        ".validate": "newData.hasChildren(['email', 'createdAt'])",
+        "email": {
+          ".validate": "newData.isString() && newData.val() === auth.token.email && newData.val().endsWith('@volcani.agri.gov.il')"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber() && newData.val() <= now"
+        },
+        "lastLoginAt": {
+          ".validate": "newData.isNumber() && newData.val() <= now"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "lectures": {
+      ".read": "auth != null && auth.token.email != null && auth.token.email.endsWith('@volcani.agri.gov.il')",
+      ".indexOn": [
+        "order"
+      ],
+      "$lectureId": {
+        ".write": "auth != null && auth.token.email != null && auth.token.email.endsWith('@volcani.agri.gov.il') && (auth.token.email === 'yehudah@volcani.agri.gov.il' || auth.token.email === root.child('config').child('ownerEmail').val() || (root.child('config').child('adminEmailsCsv').isString() && (',' + root.child('config').child('adminEmailsCsv').val() + ',').contains(',' + auth.token.email + ',')))",
+        ".validate": "newData.hasChildren(['title', 'author', 'isOpen', 'questions', 'createdAt', 'updatedAt'])",
+        "title": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 200"
+        },
+        "author": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 200"
+        },
+        "isOpen": {
+          ".validate": "newData.isBoolean()"
+        },
+        "order": {
+          ".validate": "newData.isNumber()"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber() && newData.val() <= now"
+        },
+        "updatedAt": {
+          ".validate": "newData.isNumber() && newData.val() <= now"
+        },
+        "questions": {
+          "$questionId": {
+            ".validate": "newData.hasChildren(['text', 'order'])",
+            "text": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 300"
+            },
+            "order": {
+              ".validate": "newData.isNumber()"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "votes": {
+      "$lectureId": {
+        ".read": "auth != null && auth.token.email != null && auth.token.email.endsWith('@volcani.agri.gov.il') && (auth.token.email === 'yehudah@volcani.agri.gov.il' || auth.token.email === root.child('config').child('ownerEmail').val() || (root.child('config').child('adminEmailsCsv').isString() && (',' + root.child('config').child('adminEmailsCsv').val() + ',').contains(',' + auth.token.email + ',')))",
+        "$uid": {
+          ".read": "auth != null && auth.token.email != null && auth.token.email.endsWith('@volcani.agri.gov.il') && ($uid === auth.uid || auth.token.email === 'yehudah@volcani.agri.gov.il' || auth.token.email === root.child('config').child('ownerEmail').val() || (root.child('config').child('adminEmailsCsv').isString() && (',' + root.child('config').child('adminEmailsCsv').val() + ',').contains(',' + auth.token.email + ',')))",
+          ".write": "auth != null && auth.token.email != null && auth.token.email.endsWith('@volcani.agri.gov.il') && $uid === auth.uid && !data.exists() && root.child('lectures').child($lectureId).child('isOpen').val() === true",
+          ".validate": "newData.hasChildren(['createdAt', 'answers'])",
+          "createdAt": {
+            ".validate": "newData.isNumber() && newData.val() <= now"
+          },
+          "answers": {
+            "$questionId": {
+              ".validate": "root.child('lectures').child($lectureId).child('questions').child($questionId).exists() && newData.isNumber() && newData.val() >= 1 && newData.val() <= 5"
+            }
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    }
+  }
+}
+

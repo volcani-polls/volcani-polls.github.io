@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>Volcani Polls - מנהלים</title>
+</head>
+<body>
+  <header class="topbar">
+    <a class="logo" href="admin.html"><span>V</span> ניהול Volcani Polls</a>
+    <nav>
+      <a href="home.html">���</a>
+      <a href="admin.html">הרצאות</a>
+      <a href="admin-users.html">מנהלים</a>
+      <a href="voter.html">עמוד הצבעות</a>
+      <button class="btn link" data-logout type="button">יציאה</button>
+    </nav>
+  </header>
+  <main class="container narrow">
+    <section class="page-title">
+      <div>
+        <h1>מנהלים</h1>
+        <p>Owner ראשי: <strong id="ownerEmailBox">טוען...</strong></p>
+      </div>
+    </section>
+
+    <div class="panel">
+      <h2>הגדרת מנהלים</h2>
+      <p class="muted">רשימת המנהלים מנוהלת רק ב-Firebase Realtime Database תחת config/adminEmailsCsv או ישירות ב-Rules.</p>
+      <p class="muted">אין אפשרות להוסיף או להסיר מנהלים דרך הממשק.</p>
+    </div>
+
+    <section class="panel">
+      <h2>מנהלים פעילים</h2>
+      <div id="adminsList"></div>
+    </section>
+  </main>
+  <script type="module" src="js/admin-users.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>Volcani Polls - עריכת הרצאה</title>
+</head>
+<body>
+  <header class="topbar">
+    <a class="logo" href="admin.html"><span>V</span> ניהול Volcani Polls</a>
+    <nav>
+      <a href="home.html">���</a>
+      <a href="admin.html">הרצאות</a>
+      <a href="admin-users.html">מנהלים</a>
+      <a href="voter.html">עמוד הצבעות</a>
+      <button class="btn link" data-logout type="button">יציאה</button>
+    </nav>
+  </header>
+  <main class="container narrow">
+    <section class="page-title">
+      <div>
+        <h1 id="pageTitle">עריכת הרצאה</h1>
+        <p>כל סקר חדש יכול להתחיל סגור, ולהיפתח להצבעה רק כאשר המנהל בוחר.</p>
+      </div>
+      <a class="btn" href="admin.html">חזרה לניהול</a>
+    </section>
+
+    <div id="message" class="message" hidden></div>
+
+    <form id="lectureForm" class="form panel">
+      <label>
+        Title
+        <input id="title" type="text" maxlength="200" required>
+      </label>
+      <label>
+        Author
+        <input id="author" type="text" maxlength="200" required>
+      </label>
+      <label>
+        סדר תצוגה
+        <input id="order" type="number" min="1" value="1">
+      </label>
+      <label class="checkbox-line">
+        <input id="isOpen" type="checkbox">
+        פתוח להצבעה
+      </label>
+
+      <div class="section-head">
+        <h2>שאלות הסקר</h2>
+        <button id="addQuestionBtn" class="btn small" type="button">הוסף שאלה</button>
+      </div>
+      <div id="questionsBox" class="questions-edit"></div>
+      <button id="saveLectureBtn" class="btn primary full" type="submit">שמור הרצאה</button>
+    </form>
+  </main>
+  <script type="module" src="js/admin-edit-lecture.js"></script>
+</body>
+</html>
+
+

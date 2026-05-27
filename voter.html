@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>Volcani Polls - הצבעות</title>
+</head>
+<body>
+  <header class="topbar">
+    <a class="logo" href="voter.html"><span>V</span> Volcani Polls</a>
+    <nav>
+      <a href="home.html">���</a>
+      <a href="voter.html">עמוד הצבעות</a>
+      <a id="adminLink" href="admin.html" hidden>ניהול</a>
+      <button class="btn link" data-logout type="button">יציאה</button>
+    </nav>
+  </header>
+  <main class="container">
+    <section class="page-title">
+      <div>
+        <h1>רשימת הרצאות</h1>
+        <p>שלום <span id="userEmail"></span>, בחר סקר פתוח כדי להצביע.</p>
+      </div>
+    </section>
+    <section id="lecturesList" class="lectures-list"></section>
+  </main>
+  <script type="module" src="js/voter.js"></script>
+</body>
+</html>
+
+

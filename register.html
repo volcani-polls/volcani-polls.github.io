@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>Volcani Polls - הרשמה</title>
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <div class="brand">
+      <div class="brand-mark">V</div>
+      <div>
+        <h1>הרשמה</h1>
+        <p>למשתמשי מכון וולקני בלבד</p>
+      </div>
+    </div>
+
+    <form id="registerForm" class="form">
+      <label>
+        כתובת מייל
+        <input id="email" type="email" autocomplete="email" placeholder="username@volcani.agri.gov.il" required>
+      </label>
+      <label>
+        סיסמה
+        <input id="password" type="password" autocomplete="new-password" minlength="6" required>
+      </label>
+      <label>
+        אימות סיסמה
+        <input id="password2" type="password" autocomplete="new-password" minlength="6" required>
+      </label>
+      <button id="registerBtn" class="btn primary full" type="submit">הרשמה</button>
+    </form>
+
+    <div id="message" class="message" hidden></div>
+    <p class="auth-switch">כבר יש לך משתמש? <a href="login.html">להתחברות</a></p>
+  </main>
+  <script type="module" src="js/register.js"></script>
+</body>
+</html>

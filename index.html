@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>כנס הסטודנטים השישי - המכון להנדסת מערכות חקלאיות וביולוגיות</title>
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#D4AF37',
+                            green: '#10B981',
+                            darkGreen: '#065F46',
+                            glass: 'rgba(255, 255, 255, 0.08)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Assistant', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts: Assistant for clean modern Hebrew typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom Glassmorphism & Animation Styles -->
+    <style>
+        body {
+            font-family: 'Assistant', sans-serif;
+            background-color: #020617;
+            overflow-x: hidden;
+        }
+
+        /* Pure High-End Glassmorphism (Same style as navigation bar) */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(16px) saturate(120%);
+            -webkit-backdrop-filter: blur(16px) saturate(120%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        /* Hero Glass Panel aligned perfectly with the Toolbar transparency */
+        .hero-glass-panel {
+            background: rgba(255, 255, 255, 0.06); /* Fully matches the toolbar transparent glass feel */
+            backdrop-filter: blur(16px) saturate(120%);
+            -webkit-backdrop-filter: blur(16px) saturate(120%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 50px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        /* Glowing text effect for main elements */
+        .glow-text {
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.4), 0 0 5px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Beautiful green glow under logo */
+        .logo-glow {
+            filter: drop-shadow(0 0 25px rgba(16, 185, 129, 0.35));
+        }
+
+        /* Hebrew Typewriter Cursor in Green */
+        .typing-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            direction: rtl;
+        }
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 0.9s infinite;
+            color: #10B981; /* Emerald green cursor */
+            margin-right: 4px;
+            font-weight: bold;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Smooth floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .logo-tilt-container {
+            perspective: 1200px;
+        }
+        .logo-animated {
+            transition: transform 350ms cubic-bezier(.2,.8,.2,1), filter 350ms;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+        @keyframes logo-breathe-rotate {
+            0% { transform: translateZ(0) scale(1) rotate(0deg); }
+            20% { transform: translateZ(14px) scale(1.12) rotate(8deg); }
+            50% { transform: translateZ(0) scale(1.15) rotate(12deg); }
+            80% { transform: translateZ(14px) scale(1.12) rotate(8deg); }
+            100% { transform: translateZ(0) scale(1) rotate(0deg); }
+        }
+        .logo-auto {
+            animation: logo-breathe-rotate 4s ease-in-out infinite;
+            transform-origin: center;
+        }
+        .logo-shimmer::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0) 100%);
+            transform: translateX(-120%);
+            transition: transform 0.9s ease;
+            pointer-events: none;
+            border-radius: inherit;
+        }
+        .logo-shimmer-active::after,
+        .group:hover .logo-shimmer::after {
+            transform: translateX(120%);
+        }
+    </style>
+</head>
+<body class="text-white relative min-h-screen flex flex-col justify-between">
+
+    <!-- Background-Video Container (Agricultural Technology) -->
+    <div class="fixed inset-0 w-full h-full overflow-hidden -z-20">
+        <video 
+            class="object-cover w-full h-full scale-105" 
+            autoplay 
+            loop 
+            muted 
+            playsinline>
+            <source src="https://media.istockphoto.com/id/2163006928/video/autonomous-farm-robots-transporting-organic-grown-herbs-in-automated-vertical-greenhouse.mp4" type="video/mp4">
+            הדפדפן אינו תומך בניגון וידאו.
+        </video>
+        <!-- Overlay gradients to ensure perfect contrast -->
+        <div class="absolute inset-0 bg-gradient-to-b from-black/85 via-black/60 to-slate-950/95 -z-10"></div>
+        <div class="absolute inset-0 bg-radial-at-t from-emerald-950/40 via-transparent to-transparent -z-10"></div>
+    </div>
+
+    <!-- Minimal Modern Navigation Bar -->
+    <header class="w-full z-50 sticky top-0 px-4 py-4 lg:px-8">
+        <nav class="max-w-6xl mx-auto glass-panel rounded-2xl px-6 py-4 flex justify-between items-center">
+            
+            <!-- Brand name / Institute -->
+            <div class="flex items-center gap-2.5">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </span>
+                <span class="text-gray-200 font-extrabold tracking-wide text-xs md:text-sm">המכון להנדסה חקלאית וביולוגית</span>
+            </div>
+
+            <!-- Header Dynamic Button -->
+            <div>
+                <button onclick="window.location.href='login.html'" class="px-4 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/25 text-emerald-300 font-bold text-xs md:text-sm border border-emerald-500/30 transition-all duration-300 flex items-center gap-2">
+                    <i class="fa-solid fa-square-poll-vertical animate-pulse"></i>
+                    <span>הדגמת מערכת הסקרים</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Dynamic Glassmorphism Console -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8 md:py-12 flex flex-col justify-center items-center z-10">
+        
+        <!-- HERO SECTION WITH PREMIUM SEMI-TRANSPARENT GLASSMORPHISM -->
+        <section class="w-full flex items-center justify-center">
+            <div class="hero-glass-panel rounded-3xl p-8 md:p-14 max-w-4xl w-full text-center flex flex-col items-center justify-center gap-8 relative overflow-hidden transition-all duration-300 floating">
+                
+                <!-- Gentle ambient background glows behind the glass -->
+                <div class="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/15 rounded-full blur-3xl -z-10"></div>
+                <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-teal-500/15 rounded-full blur-3xl -z-10"></div>
+                
+                <!-- Volcani W Logo (Restored with original majestic scaling and hover zoom) -->
+                <div class="flex items-center justify-center">
+                    <div class="relative group">
+                        <!-- Path restored to original local assets/Volcani_W.png with original style, onerror fallback kept -->
+                        <div class="logo-tilt-container">
+                            <img id="volcani-logo" src="assets/Volcani_W.png" alt="סמל מכון וולקני" class="h-32 md:h-40 lg:h-48 w-auto object-contain logo-glow drop-shadow-[0_4px_12px_rgba(0,0,0,0.25)] transition-transform duration-300 group-hover:scale-105 logo-animated logo-pulse logo-shimmer" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        </div>
+                        
+                        <!-- Beautiful Fallback design if image is missing -->
+                        <div class="hidden flex-col items-center justify-center p-4 rounded-2xl bg-black/40 border border-white/10 text-center w-36 shadow-lg">
+                            <i class="fa-solid fa-leaf text-emerald-400 text-3xl mb-1.5 animate-bounce"></i>
+                            <span class="text-xs text-white font-extrabold tracking-wider">מכון וולקני</span>
+                            <span class="text-[9px] text-gray-400 mt-0.5">מינהל המחקר החקלאי</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Titles (Glowing white/green color palette on glass) -->
+                <div class="max-w-3xl space-y-3">
+                    <h1 class="text-3xl md:text-5xl font-black text-white leading-tight glow-text tracking-tight">
+                        כנס הסטודנטים השישי
+                    </h1>
+                    <h2 class="text-3xl md:text-5xl font-black text-brand-darkGreen leading-tight tracking-tight">
+                        של המכון להנדסת מערכות חקלאיות וביולוגיות
+                    </h2>
+                    
+                    <!-- Hebrew Typewriter Effect - Smooth and beautifully styled -->
+                    <div class="min-h-[40px] flex items-center justify-center py-2">
+                        <p class="text-lg md:text-xl text-gray-200 font-bold tracking-wide typing-container">
+                            <span id="typing-text" class="typing-cursor"></span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Strategic Intro text on glass -->
+                <!-- <p class="max-w-2xl text-gray-300 font-semibold text-sm md:text-base leading-relaxed">
+                </p> -->
+
+                <!-- High-Impact Single CTA button to trigger interactive system demonstration -->
+                <div class="mt-4 w-full max-w-md flex flex-col items-center justify-center gap-4">
+                        <a href="login.html" class="w-full px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-800 hover:from-emerald-500 hover:to-emerald-700 text-white font-extrabold text-lg shadow-xl shadow-emerald-950/50 transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-3 active:scale-95">
+                        <i class="fa-solid fa-square-poll-vertical text-xl animate-pulse"></i>
+                        <span>מעבר למערכת הסקרים &larr;</span>
+                    </a>
+                    <p class="text-[11px] text-gray-400 font-medium">לחצו להדגמת סימולציית ההצבעה והתפלגות התוצאות</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MOCK SURVEY MODAL (INTERACTIVE POLL PREVIEW) -->
+    <div id="survey-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl hidden transition-opacity duration-300 opacity-0">
+        <div class="glass-panel rounded-3xl max-w-lg w-full overflow-hidden border border-white/20 transform transition-transform duration-300 scale-95 shadow-2xl">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-square-poll-vertical text-emerald-400 text-lg"></i>
+                    <h3 class="font-bold text-white text-base md:text-lg">הדמיית סקר אינטראקטיבי</h3>
+                </div>
+                <button onclick="closeSurveyModal()" class="text-gray-400 hover:text-white transition-colors p-1.5 rounded-full hover:bg-white/10">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content (The Survey Form) -->
+            <div class="p-6 space-y-6">
+                <!-- Question -->
+                <div class="space-y-2">
+                    <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">שאלה לדוגמה מתוך הכנס</span>
+                    <h4 class="text-lg md:text-xl font-bold text-white leading-snug">
+                        מהו התחום הטכנולוגי שישפיע באופן הדרמטי ביותר על עתיד החקלאות בעשור הקרוב?
+                    </h4>
+                </div>
+
+                <!-- Active Options Form -->
+                <div id="poll-options" class="space-y-3">
+                    <button onclick="vote(1)" class="w-full text-right p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 hover:border-emerald-500/50 transition-all duration-200 flex justify-between items-center group">
+                        <span class="font-semibold text-gray-200 group-hover:text-white">רובוטים אוטונומיים ורחפני שדה</span>
+                        <i class="fa-solid fa-chevron-left text-xs text-gray-400 group-hover:text-emerald-400 transition-transform group-hover:-translate-x-1"></i>
+                    </button>
+                    
+                    <button onclick="vote(2)" class="w-full text-right p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 hover:border-emerald-500/50 transition-all duration-200 flex justify-between items-center group">
+                        <span class="font-semibold text-gray-200 group-hover:text-white">בינה מלאכותית (AI) לחיזוי מחלות ומזיקים</span>
+                        <i class="fa-solid fa-chevron-left text-xs text-gray-400 group-hover:text-emerald-400 transition-transform group-hover:-translate-x-1"></i>
+                    </button>
+                    
+                    <button onclick="vote(3)" class="w-full text-right p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 hover:border-emerald-500/50 transition-all duration-200 flex justify-between items-center group">
+                        <span class="font-semibold text-gray-200 group-hover:text-white">חממות הידרופוניות וגידולים ורטיקליים מבוקרי אקלים</span>
+                        <i class="fa-solid fa-chevron-left text-xs text-gray-400 group-hover:text-emerald-400 transition-transform group-hover:-translate-x-1"></i>
+                    </button>
+
+                    <button onclick="vote(4)" class="w-full text-right p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 hover:border-emerald-500/50 transition-all duration-200 flex justify-between items-center group">
+                        <span class="font-semibold text-gray-200 group-hover:text-white">סנסורים חכמים ומערכות השקיה מדויקות</span>
+                        <i class="fa-solid fa-chevron-left text-xs text-gray-400 group-hover:text-emerald-400 transition-transform group-hover:-translate-x-1"></i>
+                    </button>
+                </div>
+
+                <!-- Results Display Screen (Initially Hidden) -->
+                <div id="poll-results" class="space-y-4 hidden">
+                    <p class="text-sm font-semibold text-emerald-400 text-center flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-circle-check"></i>
+                        ההצבעה נקלטה בהצלחה! התפלגות קולות הקהל בזמן אמת:
+                    </p>
+                    
+                    <!-- Result bar 1 -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <span>רובוטים ורחפני שדה</span>
+                            <span id="vote-pct-1">35%</span>
+                        </div>
+                        <div class="w-full bg-white/10 h-3 rounded-full overflow-hidden">
+                            <div id="vote-bar-1" class="bg-emerald-400 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Result bar 2 -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <span>בינה מלאכותית (AI)</span>
+                            <span id="vote-pct-2">28%</span>
+                        </div>
+                        <div class="w-full bg-white/10 h-3 rounded-full overflow-hidden">
+                            <div id="vote-bar-2" class="bg-emerald-400 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Result bar 3 -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <span>גידולים ורטיקליים מבוקרי אקלים</span>
+                            <span id="vote-pct-3">20%</span>
+                        </div>
+                        <div class="w-full bg-white/10 h-3 rounded-full overflow-hidden">
+                            <div id="vote-bar-3" class="bg-emerald-400 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Result bar 4 -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <span>סנסורים חכמים והשקיה מדויקת</span>
+                            <span id="vote-pct-4">17%</span>
+                        </div>
+                        <div class="w-full bg-white/10 h-3 rounded-full overflow-hidden">
+                            <div id="vote-bar-4" class="bg-emerald-400 h-full rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex justify-center">
+                        <button onclick="resetPoll()" class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-gray-300 hover:text-white hover:bg-white/10 transition-colors">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> הצבעה מחדש לצורך הדגמה
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-4 border-t border-white/10 bg-white/5 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <span class="text-[11px] text-gray-400 text-center sm:text-right">הסימולטור מציג את תצוגת הלוח המתוכננת להקרנה באולם הדיונים.</span>
+                <button onclick="closeSurveyModal()" class="w-full sm:w-auto px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition-colors">
+                    סגור הדמיה
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Area - Neat and minimal -->
+    <footer class="w-full py-6 px-4 border-t border-white/10 bg-slate-950/90 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-right">
+            
+            <div class="space-y-1">
+                <p class="text-xs font-bold text-white">כנס הסטודנטים השישי להנדסה חקלאית וביולוגית</p>
+                <p class="text-[10px] text-gray-400">© 2026 כל הזכויות שמורות למכון וולקני והמכון להנדסה חקלאית</p>
+            </div>
+
+            <div class="text-[10px] text-gray-400 flex items-center gap-2 justify-center">
+                <span>מכינים את הקרקע לחקלאות העתיד</span>
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span>הדמיה לפגישת תכנון</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        // Stabilized Typing effect for Right-To-Left Hebrew text flow
+        const typingTextElement = document.getElementById('typing-text');
+        const phrases = [
+            "מעצבים את עתיד החקלאות העולמית.",
+            "מציגים הנדסה, רובוטיקה וטכנולוגיית קצה.",
+            "סטודנטים מציגים מחקרים פורצי דרך.",
+            "בינה מלאכותית ומערכות חכמות בשדה המחקר."
+        ];
+        
+        let currentPhraseIndex = 0;
+        let currentCharIndex = 0;
+        let isDeleting = false;
+        let typingSpeed = 40;
+
+        function typeEffect() {
+            const currentPhrase = phrases[currentPhraseIndex];
+            
+            if (isDeleting) {
+                // Delete characters backwards cleanly
+                typingTextElement.textContent = currentPhrase.substring(0, currentCharIndex - 1);
+                currentCharIndex--;
+                typingSpeed = 20;
+            } else {
+                // Type characters forward smoothly and faster
+                typingTextElement.textContent = currentPhrase.substring(0, currentCharIndex + 1);
+                currentCharIndex++;
+                typingSpeed = 40;
+            }
+
+            // Determine State
+            if (!isDeleting && currentCharIndex === currentPhrase.length) {
+                typingSpeed = 3000; // Pause a few seconds with full phrase displayed
+                isDeleting = true;
+            } else if (isDeleting && currentCharIndex === 0) {
+                isDeleting = false;
+                currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
+                typingSpeed = 600; // Short delay before typing the next string
+            }
+
+            setTimeout(typeEffect, typingSpeed);
+        }
+
+        // Initialize script behaviors on DOM load
+        document.addEventListener('DOMContentLoaded', () => {
+            typeEffect();
+
+            // Add interactive tilt effect for logo
+            const logo = document.getElementById('volcani-logo');
+                if (logo) {
+                const container = logo.closest('.logo-tilt-container');
+                let rect = null;
+
+                // Auto breathing + rotate animation always active
+                logo.classList.add('logo-auto');
+                // Keep shimmer active class so pseudo-element animation runs
+                logo.classList.add('logo-shimmer-active');
+
+                // Preserve mouse tilt interactivity (non-required)
+                function onMove(e) {
+                    rect = container.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width;
+                    const y = (e.clientY - rect.top) / rect.height;
+                    const rotateY = (x - 0.5) * 8; // smaller tilt range to complement auto animation
+                    const rotateX = (0.5 - y) * 6;
+                    logo.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+                    logo.style.filter = `drop-shadow(0 12px 24px rgba(0,0,0,0.45)) saturate(110%)`;
+                }
+
+                function onLeave() {
+                    // let auto animation continue
+                    logo.style.transform = '';
+                    logo.style.filter = '';
+                }
+
+                container.addEventListener('mousemove', onMove);
+                container.addEventListener('mouseleave', onLeave);
+
+                // Small gentle shimmer loop when idle (still kept but optional)
+                setInterval(() => {
+                    logo.classList.add('logo-pulse');
+                    setTimeout(() => logo.classList.remove('logo-pulse'), 1200);
+                }, 4200);
+            }
+        });
+
+        // Modal Controls & Handlers
+        const modal = document.getElementById('survey-modal');
+
+        function openSurveyModal() {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.add('opacity-100');
+                modal.firstElementChild.classList.remove('scale-95');
+                modal.firstElementChild.classList.add('scale-100');
+            }, 30);
+        }
+
+        function closeSurveyModal() {
+            modal.classList.remove('opacity-100');
+            modal.firstElementChild.classList.remove('scale-100');
+            modal.firstElementChild.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Dismiss modal if user clicks surrounding backdrop area
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeSurveyModal();
+            }
+        });
+
+        // Simulated Vote Logic
+        function vote(optionIndex) {
+            // Hide selection interface
+            document.getElementById('poll-options').classList.add('hidden');
+            
+            // Expose results panel
+            const resultsSection = document.getElementById('poll-results');
+            resultsSection.classList.remove('hidden');
+
+            const defaultPercentages = [35, 28, 20, 17];
+            
+            // Boost selected user option for realism
+            defaultPercentages[optionIndex - 1] += 8;
+            
+            // Normalize sum to exactly 100%
+            const sum = defaultPercentages.reduce((a, b) => a + b, 0);
+            const normalized = defaultPercentages.map(val => Math.round((val / sum) * 100));
+
+            // Animate each distribution bar
+            for (let i = 1; i <= 4; i++) {
+                const pct = normalized[i - 1];
+                document.getElementById(`vote-pct-${i}`).textContent = `${pct}%`;
+                
+                // Animate expansion widths sequentially
+                setTimeout(() => {
+                    const bar = document.getElementById(`vote-bar-${i}`);
+                    if (bar) bar.style.width = `${pct}%`;
+                }, 100 * i);
+            }
+        }
+
+        function resetPoll() {
+            // Nullify graph bar styling
+            for (let i = 1; i <= 4; i++) {
+                const bar = document.getElementById(`vote-bar-${i}`);
+                if (bar) bar.style.width = `0%`;
+            }
+            
+            // Swap display structures back
+            document.getElementById('poll-results').classList.add('hidden');
+            document.getElementById('poll-options').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

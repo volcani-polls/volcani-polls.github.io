@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/styles.css">
+  <title>Volcani Polls - ברוכים הבאים</title>
+</head>
+<body>
+  <header class="topbar">
+    <a class="logo" href="home.html"><span>V</span> Volcani Polls</a>
+    <nav>
+      <a href="home.html">דף הבית</a>
+      <button class="btn link" data-logout type="button">יציאה</button>
+    </nav>
+  </header>
+
+  <main class="container narrow">
+    <section class="welcome-panel">
+      <p class="welcome-kicker">ברוך הבא</p>
+      <h1 id="welcomeTitle">טוען...</h1>
+      <p id="roleBadge" class="role-badge" hidden>את/ה מנהל/ת</p>
+      <p id="welcomeSubtitle" class="muted welcome-subtitle" hidden>בחר את המסלול שתרצה/י להמשיך אליו.</p>
+      <div id="welcomeActions" class="welcome-actions"></div>
+    </section>
+  </main>
+
+  <script type="module" src="js/home.js"></script>
+</body>
+</html>
