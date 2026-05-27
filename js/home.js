@@ -1,6 +1,9 @@
 import { $, isAdminUser, requireLogin, wireLogoutButtons } from "./utils.js";
 import { t } from "./i18n.js";
 
+const loadingSpinner = $("#loadingSpinner");
+const contentArea = $("#contentArea");
+
 const user = await requireLogin();
 wireLogoutButtons();
 
@@ -84,3 +87,7 @@ if (actions) {
     });
   }
 }
+
+// Hide spinner and show content
+if (loadingSpinner) loadingSpinner.style.display = "none";
+if (contentArea) contentArea.style.display = "block";

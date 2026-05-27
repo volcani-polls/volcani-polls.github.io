@@ -21,6 +21,13 @@ if (!lectureId) {
 }
 
 async function loadSurvey() {
+  form.innerHTML = `
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <p class="spinner-text">${t("loading")}</p>
+    </div>
+  `;
+  
   const [lectureSnap, voteSnap] = await Promise.all([
     get(ref(db, `lectures/${lectureId}`)),
     get(ref(db, `votes/${lectureId}/${user.uid}`)).catch(() => null)
@@ -36,14 +43,41 @@ async function loadSurvey() {
   titleEl.textContent = lecture.title || t("nav_voter");
   metaEl.textContent = `${t("lecturer")} ${lecture.author || ""}`;
 
-  if (lecture.isOpen !== true) {
-    showMessage(message, t("survey_closed_status"), "info");
-    form.hidden = true;
+  // Check if user already voted
+  if (voteSnap?.exists()) {
+    const existingVote = voteSnap.val();
+    showMessage(message, `${t("survey_voted_success")} ${t("viewing_your_answers")}`, "success");
+    
+    // Show the questions with the user's answers (read-only)
+    const questions = orderedEntries(lecture.questions || {});
+    form.innerHTML = questions.map(([qid, q], index) => {
+      const userAnswer = existingVote.answers?.[qid];
+      return `
+        <div class="question-card" data-question-id="${escapeHtml(qid)}">
+          <p class="question-text"><span class="question-num">${index + 1}</span><span class="question-content">${escapeHtml(q.text)}</span></p>
+          <div class="rating-scale-labels">
+            <span>👎 ${t("rating_scale_low")}</span>
+            <span>${t("rating_scale_high")} 👍</span>
+          </div>
+          <div class="rating-grid" role="radiogroup" aria-label="${escapeHtml(q.text)}">
+            ${[1, 2, 3, 4, 5].map((value) => `
+              <label class="rating-option">
+                <input type="radio" name="q_${escapeHtml(qid)}" value="${value}" ${userAnswer === value ? 'checked' : ''} disabled>
+                <span>${value}</span>
+              </label>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }).join("") + `
+      <a href="voter.html" class="btn primary full">${t("back_to_voter")}</a>
+    `;
     return;
   }
 
-  if (voteSnap?.exists()) {
-    showMessage(message, t("survey_voted_success"), "success");
+  // Check if poll is open
+  if (lecture.isOpen !== true) {
+    showMessage(message, t("survey_closed_status"), "info");
     form.hidden = true;
     return;
   }

@@ -39,6 +39,13 @@ function renderAdmins(ownerEmail, adminEmails) {
 }
 
 async function loadAdmins() {
+  adminsList.innerHTML = `
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <p class="spinner-text">${t("loading")}</p>
+    </div>
+  `;
+
   const ownerEmail = await getOwnerEmail().catch(() => "");
   ownerEmailBox.textContent = ownerEmail || t("no_data");
 

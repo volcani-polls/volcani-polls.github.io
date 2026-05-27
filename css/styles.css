@@ -57,11 +57,12 @@ a:hover { text-decoration: none; color: var(--primary-dark); }
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: var(--primary);
-  color: white;
+  background: transparent;
+  color: var(--text);
   display: inline-grid;
   place-items: center;
   font-weight: 800;
+  overflow: hidden;
 }
 
 .brand h1 { margin: 0; font-size: 28px; }
@@ -146,7 +147,18 @@ input:focus, textarea:focus {
   align-items: center;
   gap: 10px;
 }
-.logo span { width: 32px; height: 32px; border-radius: 10px; }
+.logo span { 
+  width: 32px; 
+  height: 32px; 
+  border-radius: 10px; 
+  background: var(--primary);
+  color: white;
+}
+.logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
 .topbar nav { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 
 .container {
@@ -303,6 +315,25 @@ input:focus, textarea:focus {
   box-shadow: 0 6px 16px rgba(47, 125, 50, .28);
 }
 
+.rating-option input:disabled + span {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.rating-option input:disabled:checked + span {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.rating-option input:disabled:not(:checked) + span {
+  background: #f0f0f0;
+  border-color: #ddd;
+  color: #999;
+}
+
 /* ── Page transition animations ── */
 @keyframes pageFadeIn {
   from { opacity: 0; transform: translateY(10px); }
@@ -422,6 +453,10 @@ input:focus, textarea:focus {
   background: #eaf7ef;
   font-weight: 800;
   padding: 8px 14px;
+}
+
+.role-badge[hidden] {
+  display: none;
 }
 
 .welcome-actions {
@@ -666,4 +701,33 @@ html[dir="ltr"] .vote-status {
 }
 .password-toggle:hover {
   color: var(--primary);
+}
+
+/* Spinner Styles */
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  gap: 16px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner-text {
+  color: var(--muted);
+  font-weight: 600;
+  margin: 0;
 }

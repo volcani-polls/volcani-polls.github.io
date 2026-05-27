@@ -21,6 +21,13 @@ async function loadResults() {
     return;
   }
 
+  resultsBox.innerHTML = `
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <p class="spinner-text">${t("loading")}</p>
+    </div>
+  `;
+
   const [lectureSnap, votesSnap] = await Promise.all([
     get(ref(db, `lectures/${lectureId}`)),
     get(ref(db, `votes/${lectureId}`)).catch(() => null)

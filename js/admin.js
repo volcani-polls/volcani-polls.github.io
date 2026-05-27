@@ -15,7 +15,12 @@ if (adminEmail) {
 }
 
 async function loadLectures() {
-  list.innerHTML = `<div class="loading-box">${t("loading_lectures")}</div>`;
+  list.innerHTML = `
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <p class="spinner-text">${t("loading_lectures")}</p>
+    </div>
+  `;
   const snap = await get(ref(db, "lectures"));
   const lectures = snap.val() || {};
 

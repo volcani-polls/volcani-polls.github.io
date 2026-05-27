@@ -20,7 +20,12 @@ if (await isAdminUser(user).catch(() => false)) {
 }
 
 async function renderLectures() {
-  list.innerHTML = `<div class="loading-box">${t("loading_lectures")}</div>`;
+  list.innerHTML = `
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <p class="spinner-text">${t("loading_lectures")}</p>
+    </div>
+  `;
   const lecturesSnap = await get(ref(db, "lectures"));
   const lectures = lecturesSnap.val() || {};
 
@@ -29,16 +34,16 @@ async function renderLectures() {
     const voteSnap = await get(ref(db, `votes/${lectureId}/${user.uid}`)).catch(() => null);
     const hasVoted = voteSnap?.exists() === true;
     const isOpen = lecture.isOpen === true;
-    const disabled = !isOpen || hasVoted;
-    const href = isOpen && !hasVoted ? `survey.html?id=${encodeURIComponent(lectureId)}` : "#";
+    const canView = isOpen || hasVoted; // Can view if open OR if already voted
+    const href = canView ? `survey.html?id=${encodeURIComponent(lectureId)}` : "#";
 
     rows.push(`
-      <a class="lecture-row ${!isOpen ? "closed" : ""} ${hasVoted ? "voted" : ""}" href="${href}" ${disabled ? "aria-disabled=\"true\"" : ""}>
+      <a class="lecture-row ${!isOpen ? "closed" : ""} ${hasVoted ? "voted" : ""}" href="${href}" ${!canView ? 'style="cursor: not-allowed; pointer-events: none;"' : ''}>
         <div class="lecture-main">
           <div><strong>${t("lecture_title_label")}:</strong> ${escapeHtml(lecture.title)}</div>
           <div><strong>${t("lecture_author_label")}:</strong> ${escapeHtml(lecture.author)}</div>
-          ${!isOpen ? `<small class="muted">${t("survey_closed_status")}</small>` : ""}
-          ${hasVoted ? `<small class="success-text">${t("voted_status_check")}</small>` : ""}
+          ${!isOpen && !hasVoted ? `<small class="muted">${t("survey_closed_status")}</small>` : ""}
+          ${hasVoted ? `<small class="success-text">${t("voted_status_check")} • ${t("view_your_vote")}</small>` : ""}
         </div>
         <div class="vote-status" title="סטטוס הצבעה">${hasVoted ? "✓" : ""}</div>
       </a>
@@ -51,10 +56,6 @@ async function renderLectures() {
   }
 
   list.innerHTML = rows.join("");
-
-  document.querySelectorAll(".lecture-row[aria-disabled='true']").forEach((row) => {
-    row.addEventListener("click", (e) => e.preventDefault());
-  });
 }
 
 renderLectures().catch((err) => {
