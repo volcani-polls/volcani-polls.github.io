@@ -1,6 +1,7 @@
 import { db } from "./firebase-init.js";
 import { get, ref, set } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import { $, escapeHtml, getQueryParam, orderedEntries, ratingLabel, requireLogin, setLoading, showMessage, wireLogoutButtons } from "./utils.js";
+import { t } from "./i18n.js";
 
 const user = await requireLogin();
 wireLogoutButtons();
@@ -13,7 +14,7 @@ const message = $("#message");
 const submitBtn = $("#submitVoteBtn");
 
 if (!lectureId) {
-  showMessage(message, "חסר מזהה סקר.", "error");
+  showMessage(message, t("missing_poll_id"), "error");
   form.hidden = true;
 } else {
   await loadSurvey();
@@ -26,30 +27,30 @@ async function loadSurvey() {
   ]);
 
   if (!lectureSnap.exists()) {
-    showMessage(message, "הסקר לא נמצא.", "error");
+    showMessage(message, t("poll_not_found"), "error");
     form.hidden = true;
     return;
   }
 
   const lecture = lectureSnap.val();
-  titleEl.textContent = lecture.title || "סקר";
-  metaEl.textContent = `מרצה: ${lecture.author || ""}`;
+  titleEl.textContent = lecture.title || t("nav_voter");
+  metaEl.textContent = `${t("lecturer")} ${lecture.author || ""}`;
 
   if (lecture.isOpen !== true) {
-    showMessage(message, "הסקר עדיין סגור להצבעה.", "info");
+    showMessage(message, t("survey_closed_status"), "info");
     form.hidden = true;
     return;
   }
 
   if (voteSnap?.exists()) {
-    showMessage(message, "כבר הצבעת בסקר זה. תודה!", "success");
+    showMessage(message, t("survey_voted_success"), "success");
     form.hidden = true;
     return;
   }
 
   const questions = orderedEntries(lecture.questions || {});
   if (!questions.length) {
-    showMessage(message, "בסקר זה עדיין אין שאלות.", "info");
+    showMessage(message, t("no_questions_in_survey"), "info");
     form.hidden = true;
     return;
   }
@@ -57,7 +58,7 @@ async function loadSurvey() {
   form.innerHTML = questions.map(([qid, q], index) => `
     <fieldset class="question-card" data-question-id="${escapeHtml(qid)}">
       <legend>${index + 1}. ${escapeHtml(q.text)}</legend>
-      <div class="rating-help"><span>👎 1 = הכי נמוך</span><span>5 = הכי גבוה 👍</span></div>
+      <div class="rating-help"><span>${t("rating_low")}</span><span>${t("rating_high")}</span></div>
       <div class="rating-grid" role="radiogroup" aria-label="${escapeHtml(q.text)}">
         ${[1, 2, 3, 4, 5].map((value) => `
           <label class="rating-option">
@@ -68,7 +69,7 @@ async function loadSurvey() {
       </div>
     </fieldset>
   `).join("") + `
-    <button id="submitVoteBtn" class="btn primary full" type="submit">שלח הצבעה</button>
+    <button id="submitVoteBtn" class="btn primary full" type="submit">${t("send_vote")}</button>
   `;
 
   form.addEventListener("submit", async (event) => {
@@ -82,7 +83,7 @@ async function submitVote(questions) {
   for (const [qid] of questions) {
     const selected = document.querySelector(`input[name="q_${CSS.escape(qid)}"]:checked`);
     if (!selected) {
-      showMessage(message, "יש לענות על כל השאלות לפני שליחה.", "error");
+      showMessage(message, t("answer_all_questions_error"), "error");
       return;
     }
     answers[qid] = Number(selected.value);
@@ -90,16 +91,16 @@ async function submitVote(questions) {
 
   try {
     const btn = $("#submitVoteBtn");
-    setLoading(btn, true, "שולח...");
+    setLoading(btn, true, t("sending"));
     await set(ref(db, `votes/${lectureId}/${user.uid}`), {
       createdAt: Date.now(),
       answers
     });
-    showMessage(message, "ההצבעה נשמרה בהצלחה. תודה!", "success");
+    showMessage(message, t("vote_saved_success"), "success");
     setTimeout(() => window.location.href = "voter.html", 900);
   } catch (err) {
     console.error(err);
-    showMessage(message, "לא ניתן לשמור את ההצבעה. ייתכן שכבר הצבעת או שהסקר נסגר.", "error");
+    showMessage(message, t("vote_save_failed"), "error");
   } finally {
     const btn = $("#submitVoteBtn");
     setLoading(btn, false);

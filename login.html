@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
-  <title>Volcani Polls - התחברות</title>
+  <title data-i18n="login">Volcani Polls - התחברות</title>
+  <!-- i18n support -->
+  <script type="module" src="js/i18n.js"></script>
 </head>
 <body class="auth-page">
   <main class="auth-card">
@@ -12,26 +15,29 @@
       <div class="brand-mark">V</div>
       <div>
         <h1>Volcani Polls</h1>
-        <p>מערכת סקרי הרצאות</p>
+        <p data-i18n="app_title">מערכת סקרי הרצאות</p>
       </div>
     </div>
 
     <form id="loginForm" class="form">
       <label>
-        כתובת מייל
+        <span data-i18n="email">כתובת מייל</span>
         <input id="email" type="email" autocomplete="email" placeholder="username@volcani.agri.gov.il" required>
       </label>
       <label>
-        סיסמה
+        <span data-i18n="password">סיסמה</span>
         <input id="password" type="password" autocomplete="current-password" required>
       </label>
-      <button id="loginBtn" class="btn primary full" type="submit">התחברות</button>
+      <button id="loginBtn" class="btn primary full" type="submit" data-i18n="login">התחברות</button>
     </form>
 
     <div id="message" class="message" hidden></div>
 
-    <p class="auth-switch">אין לך משתמש? <a href="register.html">להרשמה</a></p>
-    <p class="tiny-note">הגישה מותרת רק למיילים שמסתיימים ב־@volcani.agri.gov.il</p>
+    <p class="auth-switch">
+      <span data-i18n="dont_have_user">אין לך משתמש? </span>
+      <a href="register.html" data-i18n="register">להרשמה</a>
+    </p>
+    <p class="tiny-note" data-i18n="allowed_emails_note">הגישה מותרת רק למיילים שמסתיימים ב־@volcani.agri.gov.il</p>
   </main>
   <script type="module" src="js/auth.js"></script>
 </body>

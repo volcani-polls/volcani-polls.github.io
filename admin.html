@@ -3,27 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
-  <title>Volcani Polls - ניהול</title>
+  <title data-i18n="nav_admin">ממשק ניהול</title>
 </head>
 <body>
   <header class="topbar">
-    <a class="logo" href="admin.html"><span>V</span> ניהול Volcani Polls</a>
+    <a class="logo" href="home.html"><span>V</span> Volcani Polls</a>
     <nav>
-      <a href="home.html">���</a>
-      <a href="admin.html">הרצאות</a>
-      <a href="admin-users.html">מנהלים</a>
-      <a href="voter.html">עמוד הצבעות</a>
-      <button class="btn link" data-logout type="button">יציאה</button>
+      <a href="home.html" data-i18n="nav_home"><i class="fa-solid fa-house"></i> דף הבית</a>
+      <a href="admin.html" data-i18n="nav_admin">ממשק ניהול</a>
+      <a href="admin-users.html" data-i18n="nav_admin_users">ניהול מנהלים</a>
+      <a href="voter.html" data-i18n="nav_voter">עמוד הצבעות</a>
+      <button class="btn link" data-logout type="button" data-i18n="nav_logout">יציאה</button>
     </nav>
   </header>
   <main class="container">
     <section class="page-title">
       <div>
-        <h1>ניהול הרצאות</h1>
-        <p>מחובר כמנהל: <span id="adminEmail"></span></p>
+        <h1 data-i18n="nav_admin">ממשק ניהול</h1>
+        <p>
+          <span data-i18n="connected_as_admin">מחובר כעת בתור מנהל:</span>
+          <strong id="adminEmail"></strong>
+        </p>
       </div>
-      <a class="btn primary" href="admin-edit-lecture.html?new=1">הוסף הרצאה</a>
+      <a class="btn primary" href="admin-edit-lecture.html?new=1" data-i18n="add_lecture">הוספת הרצאה חדשה</a>
     </section>
     <div id="message" class="message" hidden></div>
     <section id="adminLecturesList" class="admin-list"></section>
@@ -31,5 +35,3 @@
   <script type="module" src="js/admin.js"></script>
 </body>
 </html>
-
-

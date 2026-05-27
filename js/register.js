@@ -2,6 +2,7 @@ import { auth, db } from "./firebase-init.js";
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { ref, set } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import { $, isAllowedEmail, normalizeEmail, setLoading, showMessage } from "./utils.js";
+import { t } from "./i18n.js";
 
 const form = $("#registerForm");
 const message = $("#message");
@@ -16,20 +17,20 @@ form?.addEventListener("submit", async (event) => {
   const password2 = $("#password2").value;
 
   if (!isAllowedEmail(email)) {
-    showMessage(message, "ניתן להירשם רק עם כתובת מייל שמסתיימת ב־@volcani.agri.gov.il", "error");
+    showMessage(message, t("register_domain_constraint"), "error");
     return;
   }
   if (password.length < 6) {
-    showMessage(message, "הסיסמה חייבת להכיל לפחות 6 תווים.", "error");
+    showMessage(message, t("password_length_error"), "error");
     return;
   }
   if (password !== password2) {
-    showMessage(message, "הסיסמאות אינן זהות.", "error");
+    showMessage(message, t("passwords_dont_match"), "error");
     return;
   }
 
   try {
-    setLoading(submitBtn, true, "נרשם...");
+    setLoading(submitBtn, true);
     const credential = await createUserWithEmailAndPassword(auth, email, password);
     await set(ref(db, `users/${credential.user.uid}`), {
       email,
@@ -39,9 +40,9 @@ form?.addEventListener("submit", async (event) => {
     window.location.href = "home.html";
   } catch (err) {
     console.error(err);
-    let msg = "הרשמה נכשלה. נסה שוב.";
-    if (err.code === "auth/email-already-in-use") msg = "כתובת המייל כבר רשומה. עבור למסך התחברות.";
-    if (err.code === "auth/weak-password") msg = "הסיסמה חלשה מדי.";
+    let msg = t("register_failed");
+    if (err.code === "auth/email-already-in-use") msg = t("email_in_use_error");
+    if (err.code === "auth/weak-password") msg = t("weak_password_error");
     showMessage(message, msg, "error");
   } finally {
     setLoading(submitBtn, false);

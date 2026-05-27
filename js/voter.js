@@ -1,6 +1,7 @@
 import { db } from "./firebase-init.js";
 import { get, ref } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import { $, escapeHtml, isAdminUser, orderedEntries, requireLogin, wireLogoutButtons } from "./utils.js";
+import { t } from "./i18n.js";
 
 const user = await requireLogin();
 wireLogoutButtons();
@@ -16,7 +17,7 @@ if (await isAdminUser(user).catch(() => false)) {
 }
 
 async function renderLectures() {
-  list.innerHTML = `<div class="loading-box">טוען הרצאות...</div>`;
+  list.innerHTML = `<div class="loading-box">${t("loading_lectures")}</div>`;
   const lecturesSnap = await get(ref(db, "lectures"));
   const lectures = lecturesSnap.val() || {};
 
@@ -31,10 +32,10 @@ async function renderLectures() {
     rows.push(`
       <a class="lecture-row ${!isOpen ? "closed" : ""} ${hasVoted ? "voted" : ""}" href="${href}" ${disabled ? "aria-disabled=\"true\"" : ""}>
         <div class="lecture-main">
-          <div><strong>Title:</strong> ${escapeHtml(lecture.title)}</div>
-          <div><strong>Author:</strong> ${escapeHtml(lecture.author)}</div>
-          ${!isOpen ? `<small class="muted">הסקר עדיין סגור להצבעה</small>` : ""}
-          ${hasVoted ? `<small class="success-text">כבר הצבעת בסקר זה</small>` : ""}
+          <div><strong>${t("lecture_title_label")}:</strong> ${escapeHtml(lecture.title)}</div>
+          <div><strong>${t("lecture_author_label")}:</strong> ${escapeHtml(lecture.author)}</div>
+          ${!isOpen ? `<small class="muted">${t("survey_closed_status")}</small>` : ""}
+          ${hasVoted ? `<small class="success-text">${t("voted_status_check")}</small>` : ""}
         </div>
         <div class="vote-status" title="סטטוס הצבעה">${hasVoted ? "✓" : ""}</div>
       </a>
@@ -42,7 +43,7 @@ async function renderLectures() {
   }
 
   if (!rows.length) {
-    list.innerHTML = `<div class="empty-state">אין כרגע הרצאות להצגה.</div>`;
+    list.innerHTML = `<div class="empty-state">${t("empty_state")}</div>`;
     return;
   }
 
@@ -55,5 +56,5 @@ async function renderLectures() {
 
 renderLectures().catch((err) => {
   console.error(err);
-  list.innerHTML = `<div class="message error">שגיאה בטעינת ההרצאות.</div>`;
+  list.innerHTML = `<div class="message error">${t("lectures_load_error")}</div>`;
 });

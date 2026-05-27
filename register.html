@@ -3,37 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
-  <title>Volcani Polls - הרשמה</title>
+  <title data-i18n="register">Volcani Polls - הרשמה</title>
+  <!-- i18n support -->
+  <script type="module" src="js/i18n.js"></script>
 </head>
 <body class="auth-page">
   <main class="auth-card">
     <div class="brand">
       <div class="brand-mark">V</div>
       <div>
-        <h1>הרשמה</h1>
-        <p>למשתמשי מכון וולקני בלבד</p>
+        <h1>Volcani Polls</h1>
+        <p data-i18n="app_title">מערכת סקרי הרצאות</p>
       </div>
     </div>
 
     <form id="registerForm" class="form">
       <label>
-        כתובת מייל
+        <span data-i18n="email">כתובת מייל</span>
         <input id="email" type="email" autocomplete="email" placeholder="username@volcani.agri.gov.il" required>
       </label>
       <label>
-        סיסמה
-        <input id="password" type="password" autocomplete="new-password" minlength="6" required>
+        <span data-i18n="password_label_rules">סיסמה (לפחות 6 תווים)</span>
+        <input id="password" type="password" autocomplete="new-password" required>
       </label>
       <label>
-        אימות סיסמה
-        <input id="password2" type="password" autocomplete="new-password" minlength="6" required>
+        <span data-i18n="confirm_password">אימות סיסמה</span>
+        <input id="password2" type="password" autocomplete="new-password" required>
       </label>
-      <button id="registerBtn" class="btn primary full" type="submit">הרשמה</button>
+      <button id="registerBtn" class="btn primary full" type="submit" data-i18n="register">הרשמה</button>
     </form>
 
     <div id="message" class="message" hidden></div>
-    <p class="auth-switch">כבר יש לך משתמש? <a href="login.html">להתחברות</a></p>
+
+    <p class="auth-switch">
+      <span data-i18n="already_have_user">כבר יש לך משתמש? </span>
+      <a href="login.html" data-i18n="login">להתחברות</a>
+    </p>
+    <p class="tiny-note" data-i18n="allowed_emails_note">הגישה מותרת רק למיילים שמסתיימים ב־@volcani.agri.gov.il</p>
   </main>
   <script type="module" src="js/register.js"></script>
 </body>

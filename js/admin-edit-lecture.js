@@ -1,6 +1,7 @@
 import { db } from "./firebase-init.js";
 import { get, push, ref, set, update } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import { $, escapeHtml, getQueryParam, orderedEntries, requireAdmin, setLoading, showMessage, wireLogoutButtons } from "./utils.js";
+import { t } from "./i18n.js";
 
 await requireAdmin();
 wireLogoutButtons();
@@ -16,16 +17,16 @@ const saveBtn = $("#saveLectureBtn");
 
 let currentLectureId = lectureId;
 
-pageTitle.textContent = isNew ? "הוספת הרצאה" : "עריכת הרצאה";
+pageTitle.textContent = isNew ? t("add_lecture") : t("edit_lecture");
 
 function addQuestionRow(text = "", order = null) {
   const index = questionsBox.children.length + 1;
   const row = document.createElement("div");
   row.className = "question-edit-row";
   row.innerHTML = `
-    <input class="question-text" type="text" placeholder="טקסט שאלה" value="${escapeHtml(text)}" required>
-    <input class="question-order" type="number" min="1" value="${order ?? index}" title="סדר">
-    <button class="btn danger small" type="button">הסר</button>
+    <input class="question-text" type="text" placeholder="${t("question_text_placeholder")}" value="${escapeHtml(text)}" required>
+    <input class="question-order" type="number" min="1" value="${order ?? index}" title="${t("lecture_order_label")}">
+    <button class="btn danger small" type="button">${t("delete")}</button>
   `;
   row.querySelector("button").addEventListener("click", () => row.remove());
   questionsBox.appendChild(row);
@@ -34,15 +35,15 @@ function addQuestionRow(text = "", order = null) {
 async function loadLecture() {
   if (isNew) {
     $("#isOpen").checked = false;
-    addQuestionRow("עד כמה ההרצאה הייתה ברורה?", 1);
-    addQuestionRow("עד כמה הנושא היה רלוונטי עבורך?", 2);
-    addQuestionRow("עד כמה המרצה העביר/ה את התוכן בצורה טובה?", 3);
+    addQuestionRow(t("default_q1") || "עד כמה ההרצאה הייתה ברורה?", 1);
+    addQuestionRow(t("default_q2") || "עד כמה הנושא היה רלוונטי עבורך?", 2);
+    addQuestionRow(t("default_q3") || "עד כמה המרצה העביר/ה את התוכן בצורה טובה?", 3);
     return;
   }
 
   const snap = await get(ref(db, `lectures/${lectureId}`));
   if (!snap.exists()) {
-    showMessage(message, "ההרצאה לא נמצאה.", "error");
+    showMessage(message, t("poll_not_found"), "error");
     form.hidden = true;
     return;
   }
@@ -79,16 +80,16 @@ form.addEventListener("submit", async (event) => {
   });
 
   if (!title || !author) {
-    showMessage(message, "יש למלא שם הרצאה ושם מרצה.", "error");
+    showMessage(message, t("fill_all_fields_error"), "error");
     return;
   }
   if (!Object.keys(questions).length) {
-    showMessage(message, "יש להוסיף לפחות שאלה אחת.", "error");
+    showMessage(message, t("add_at_least_one_question"), "error");
     return;
   }
 
   try {
-    setLoading(saveBtn, true, "שומר...");
+    setLoading(saveBtn, true, t("sending"));
     const now = Date.now();
     if (isNew) {
       const newRef = push(ref(db, "lectures"));
@@ -112,11 +113,11 @@ form.addEventListener("submit", async (event) => {
         updatedAt: now
       });
     }
-    showMessage(message, "ההרצאה נשמרה בהצלחה.", "success");
+    showMessage(message, t("poll_saved"), "success");
     setTimeout(() => window.location.href = "admin.html", 700);
   } catch (err) {
     console.error(err);
-    showMessage(message, "שמירה נכשלה. בדוק הרשאות ושדות.", "error");
+    showMessage(message, t("poll_save_failed"), "error");
   } finally {
     setLoading(saveBtn, false);
   }
@@ -124,5 +125,5 @@ form.addEventListener("submit", async (event) => {
 
 loadLecture().catch((err) => {
   console.error(err);
-  showMessage(message, "שגיאה בטעינת ההרצאה.", "error");
+  showMessage(message, t("lectures_load_error"), "error");
 });

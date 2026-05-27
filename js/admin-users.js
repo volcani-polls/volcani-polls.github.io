@@ -1,6 +1,7 @@
 import { db } from "./firebase-init.js";
 import { get, ref } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import { $, BOOTSTRAP_OWNER_EMAIL, escapeHtml, getOwnerEmail, normalizeEmail, requireAdmin, wireLogoutButtons } from "./utils.js";
+import { t } from "./i18n.js";
 
 await requireAdmin();
 wireLogoutButtons();
@@ -31,7 +32,7 @@ function renderAdmins(ownerEmail, adminEmails) {
     <div class="admin-user-row">
       <div>
         <strong>${escapeHtml(email)}</strong>
-        <div class="muted">${email === ownerEmail || email === BOOTSTRAP_OWNER_EMAIL ? "Owner / Rules" : "config/adminEmailsCsv"}</div>
+        <div class="muted">${email === ownerEmail || email === BOOTSTRAP_OWNER_EMAIL ? t("owner_rules_label") : t("csv_label")}</div>
       </div>
     </div>
   `).join("");
@@ -39,7 +40,7 @@ function renderAdmins(ownerEmail, adminEmails) {
 
 async function loadAdmins() {
   const ownerEmail = await getOwnerEmail().catch(() => "");
-  ownerEmailBox.textContent = ownerEmail || "לא הוגדר";
+  ownerEmailBox.textContent = ownerEmail || t("no_data");
 
   const snap = await get(ref(db, "config/adminEmailsCsv")).catch(() => null);
   const adminEmails = parseAdminEmails(snap?.val?.() || "");
@@ -48,5 +49,5 @@ async function loadAdmins() {
 
 loadAdmins().catch((err) => {
   console.error(err);
-  adminsList.innerHTML = `<div class="message error">שגיאה בטעינת מנהלים.</div>`;
+  adminsList.innerHTML = `<div class="message error">${t("lectures_load_error")}</div>`;
 });

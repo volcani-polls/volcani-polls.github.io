@@ -1,6 +1,7 @@
 import { db } from "./firebase-init.js";
 import { get, ref } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import { $, calculateResults, escapeHtml, getQueryParam, orderedEntries, requireAdmin, wireLogoutButtons } from "./utils.js";
+import { t } from "./i18n.js";
 
 await requireAdmin();
 wireLogoutButtons();
@@ -11,12 +12,12 @@ const metaEl = $("#lectureMeta");
 const resultsBox = $("#resultsBox");
 
 function fmt(num) {
-  return num === null || num === undefined ? "אין נתונים" : Number(num).toFixed(2);
+  return num === null || num === undefined ? t("no_data") : Number(num).toFixed(2);
 }
 
 async function loadResults() {
   if (!lectureId) {
-    resultsBox.innerHTML = `<div class="message error">חסר מזהה הרצאה.</div>`;
+    resultsBox.innerHTML = `<div class="message error">${t("missing_poll_id")}</div>`;
     return;
   }
 
@@ -26,7 +27,7 @@ async function loadResults() {
   ]);
 
   if (!lectureSnap.exists()) {
-    resultsBox.innerHTML = `<div class="message error">ההרצאה לא נמצאה.</div>`;
+    resultsBox.innerHTML = `<div class="message error">${t("poll_not_found")}</div>`;
     return;
   }
 
@@ -35,7 +36,7 @@ async function loadResults() {
   const stats = calculateResults(lecture, votes);
 
   titleEl.textContent = lecture.title;
-  metaEl.textContent = `מרצה: ${lecture.author} | מספר מצביעים: ${stats.votersCount}`;
+  metaEl.textContent = `${t("lecturer")} ${lecture.author} | ${t("voters_count")}: ${stats.votersCount}`;
 
   const rows = orderedEntries(stats.questionStats).map(([qid, stat], idx) => `
     <tr>
@@ -48,16 +49,16 @@ async function loadResults() {
 
   resultsBox.innerHTML = `
     <div class="result-summary">
-      <div class="summary-card"><span>מספר מצביעים</span><strong>${stats.votersCount}</strong></div>
-      <div class="summary-card"><span>מספר תשובות</span><strong>${stats.totalAnswers}</strong></div>
-      <div class="summary-card"><span>ממוצע סופי</span><strong>${fmt(stats.finalAverage)}</strong></div>
+      <div class="summary-card"><span>${t("voters_count")}</span><strong>${stats.votersCount}</strong></div>
+      <div class="summary-card"><span>${t("total_answers")}</span><strong>${stats.totalAnswers}</strong></div>
+      <div class="summary-card"><span>${t("final_average")}</span><strong>${fmt(stats.finalAverage)}</strong></div>
     </div>
     <div class="table-wrap">
       <table class="results-table">
         <thead>
-          <tr><th>#</th><th>שאלה</th><th>מספר מדרגים</th><th>ממוצע</th></tr>
+          <tr><th>#</th><th>${t("question_column")}</th><th>${t("voters_column")}</th><th>${t("average_column")}</th></tr>
         </thead>
-        <tbody>${rows || `<tr><td colspan="4">אין נתונים להצגה.</td></tr>`}</tbody>
+        <tbody>${rows || `<tr><td colspan="4">${t("no_data_to_display")}</td></tr>`}</tbody>
       </table>
     </div>
   `;
@@ -65,5 +66,5 @@ async function loadResults() {
 
 loadResults().catch((err) => {
   console.error(err);
-  resultsBox.innerHTML = `<div class="message error">שגיאה בטעינת התוצאות.</div>`;
+  resultsBox.innerHTML = `<div class="message error">${t("lectures_load_error")}</div>`;
 });

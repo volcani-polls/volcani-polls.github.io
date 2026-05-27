@@ -3,32 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
-  <title>Volcani Polls - תוצאות</title>
+  <title data-i18n="nav_results">תוצאות סקר</title>
 </head>
 <body>
   <header class="topbar">
-    <a class="logo" href="admin.html"><span>V</span> ניהול Volcani Polls</a>
+    <a class="logo" href="home.html"><span>V</span> Volcani Polls</a>
     <nav>
-      <a href="home.html">���</a>
-      <a href="admin.html">הרצאות</a>
-      <a href="admin-users.html">מנהלים</a>
-      <a href="voter.html">עמוד הצבעות</a>
-      <button class="btn link" data-logout type="button">יציאה</button>
+      <a href="home.html" data-i18n="nav_home"><i class="fa-solid fa-house"></i> דף הבית</a>
+      <a href="admin.html" data-i18n="nav_admin">ממשק ניהול</a>
+      <a href="admin-users.html" data-i18n="nav_admin_users">ניהול מנהלים</a>
+      <a href="voter.html" data-i18n="nav_voter">עמוד הצבעות</a>
+      <button class="btn link" data-logout type="button" data-i18n="nav_logout">יציאה</button>
     </nav>
   </header>
   <main class="container">
     <section class="page-title">
       <div>
-        <h1 id="lectureTitle">תוצאות</h1>
+        <h1 id="lectureTitle" data-i18n="loading">טוען...</h1>
         <p id="lectureMeta"></p>
       </div>
-      <a class="btn" href="admin.html">חזרה לניהול</a>
+      <a class="btn" href="admin.html" data-i18n="back_to_admin">חזרה לממשק ניהול</a>
     </section>
     <section id="resultsBox"></section>
   </main>
   <script type="module" src="js/admin-results.js"></script>
 </body>
 </html>
-
-

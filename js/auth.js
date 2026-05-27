@@ -2,6 +2,7 @@ import { auth, db } from "./firebase-init.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { ref, update } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import { $, getQueryParam, isAllowedEmail, normalizeEmail, setLoading, showMessage, updateLastLogin, waitForUser } from "./utils.js";
+import { t } from "./i18n.js";
 
 const form = $("#loginForm");
 const message = $("#message");
@@ -17,7 +18,7 @@ async function redirectIfAlreadyLoggedIn() {
 
 const error = getQueryParam("error");
 if (error === "domain") {
-  showMessage(message, "הגישה מותרת רק עם כתובת מייל של מכון וולקני.", "error");
+  showMessage(message, t("domain_error_msg"), "error");
 }
 
 form?.addEventListener("submit", async (event) => {
@@ -28,12 +29,12 @@ form?.addEventListener("submit", async (event) => {
   const password = $("#password").value;
 
   if (!isAllowedEmail(email)) {
-    showMessage(message, "ניתן להתחבר רק עם כתובת מייל שמסתיימת ב־@volcani.agri.gov.il", "error");
+    showMessage(message, t("login_domain_constraint"), "error");
     return;
   }
 
   try {
-    setLoading(submitBtn, true, "מתחבר...");
+    setLoading(submitBtn, true);
     const credential = await signInWithEmailAndPassword(auth, email, password);
     await update(ref(db, `users/${credential.user.uid}`), {
       email,
@@ -42,7 +43,7 @@ form?.addEventListener("submit", async (event) => {
     window.location.href = "home.html";
   } catch (err) {
     console.error(err);
-    showMessage(message, "התחברות נכשלה. בדוק מייל וסיסמה ונסה שוב.", "error");
+    showMessage(message, t("login_failed_msg"), "error");
   } finally {
     setLoading(submitBtn, false);
   }

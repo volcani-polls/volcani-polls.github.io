@@ -3,59 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
-  <title>Volcani Polls - עריכת הרצאה</title>
+  <title data-i18n="nav_admin">עריכת הרצאה</title>
 </head>
 <body>
   <header class="topbar">
-    <a class="logo" href="admin.html"><span>V</span> ניהול Volcani Polls</a>
+    <a class="logo" href="home.html"><span>V</span> Volcani Polls</a>
     <nav>
-      <a href="home.html">���</a>
-      <a href="admin.html">הרצאות</a>
-      <a href="admin-users.html">מנהלים</a>
-      <a href="voter.html">עמוד הצבעות</a>
-      <button class="btn link" data-logout type="button">יציאה</button>
+      <a href="home.html" data-i18n="nav_home"><i class="fa-solid fa-house"></i> דף הבית</a>
+      <a href="admin.html" data-i18n="nav_admin">ממשק ניהול</a>
+      <a href="admin-users.html" data-i18n="nav_admin_users">ניהול מנהלים</a>
+      <a href="voter.html" data-i18n="nav_voter">עמוד הצבעות</a>
+      <button class="btn link" data-logout type="button" data-i18n="nav_logout">יציאה</button>
     </nav>
   </header>
   <main class="container narrow">
     <section class="page-title">
       <div>
-        <h1 id="pageTitle">עריכת הרצאה</h1>
-        <p>כל סקר חדש יכול להתחיל סגור, ולהיפתח להצבעה רק כאשר המנהל בוחר.</p>
+        <h1 id="pageTitle" data-i18n="loading">טוען...</h1>
+        <p data-i18n="edit_lecture_desc">כאן תוכל להוסיף או לערוך את פרטי ההרצאה, את סדר ההצגה שלה, ואת השאלות שיופיעו בסקר עבור המצביעים.</p>
       </div>
-      <a class="btn" href="admin.html">חזרה לניהול</a>
+      <a class="btn" href="admin.html" data-i18n="back_to_admin">חזרה לממשק ניהול</a>
     </section>
 
     <div id="message" class="message" hidden></div>
 
     <form id="lectureForm" class="form panel">
       <label>
-        Title
+        <span data-i18n="lecture_title_label">נושא ההרצאה</span>
         <input id="title" type="text" maxlength="200" required>
       </label>
       <label>
-        Author
+        <span data-i18n="lecture_author_label">שם המרצה</span>
         <input id="author" type="text" maxlength="200" required>
       </label>
       <label>
-        סדר תצוגה
+        <span data-i18n="lecture_order_label">סדר הצגה</span>
         <input id="order" type="number" min="1" value="1">
       </label>
       <label class="checkbox-line">
         <input id="isOpen" type="checkbox">
-        פתוח להצבעה
+        <span data-i18n="open_for_voting">פתח להצבעה</span>
       </label>
 
       <div class="section-head">
-        <h2>שאלות הסקר</h2>
-        <button id="addQuestionBtn" class="btn small" type="button">הוסף שאלה</button>
+        <h2 data-i18n="survey_questions">שאלות הסקר</h2>
+        <button id="addQuestionBtn" class="btn small" type="button" data-i18n="add_question">הוספת שאלה</button>
       </div>
       <div id="questionsBox" class="questions-edit"></div>
-      <button id="saveLectureBtn" class="btn primary full" type="submit">שמור הרצאה</button>
+      <button id="saveLectureBtn" class="btn primary full" type="submit" data-i18n="save_lecture">שמור הרצאה</button>
     </form>
   </main>
   <script type="module" src="js/admin-edit-lecture.js"></script>
 </body>
 </html>
-
-

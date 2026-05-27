@@ -1,6 +1,7 @@
 import { auth, db } from "./firebase-init.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import { get, ref, update } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import { t } from "./i18n.js";
 
 export const ALLOWED_DOMAIN = "@volcani.agri.gov.il";
 export const BOOTSTRAP_OWNER_EMAIL = "yehudah@volcani.agri.gov.il";
@@ -38,11 +39,12 @@ export function showMessage(elementOrSelector, message, type = "info") {
   el.hidden = !message;
 }
 
-export function setLoading(button, isLoading, loadingText = "טוען...") {
+export function setLoading(button, isLoading, loadingText = "") {
   if (!button) return;
+  const textToUse = loadingText || t("loading");
   if (isLoading) {
     button.dataset.originalText = button.textContent;
-    button.textContent = loadingText;
+    button.textContent = textToUse;
     button.disabled = true;
   } else {
     button.textContent = button.dataset.originalText || button.textContent;
@@ -133,7 +135,9 @@ export function wireLogoutButtons() {
 
 export function formatDate(timestamp) {
   if (!timestamp) return "";
-  return new Intl.DateTimeFormat("he-IL", {
+  const lang = localStorage.getItem("lang") || "he";
+  const locale = lang === "he" ? "he-IL" : "en-US";
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: "short",
     timeStyle: "short"
   }).format(new Date(timestamp));
@@ -191,7 +195,7 @@ export function calculateResults(lecture, votes) {
 }
 
 export function ratingLabel(value) {
-  if (value === 1) return "1 👎";
-  if (value === 5) return "5 👍";
+  if (value === 1) return t("rating_low");
+  if (value === 5) return t("rating_high");
   return String(value);
 }

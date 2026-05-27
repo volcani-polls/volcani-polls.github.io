@@ -1,4 +1,5 @@
 import { $, isAdminUser, requireLogin, wireLogoutButtons } from "./utils.js";
+import { t } from "./i18n.js";
 
 const user = await requireLogin();
 wireLogoutButtons();
@@ -41,7 +42,7 @@ function actionButton({ href, icon, title, subtitle, primary = false }) {
 }
 
 if (welcomeTitle) {
-  welcomeTitle.textContent = `שלום ${user?.email || ""}`;
+  welcomeTitle.textContent = `${t("hello")} ${user?.email || ""}`;
 }
 
 const admin = await isAdminUser(user).catch(() => false);
@@ -60,15 +61,15 @@ if (actions) {
       actionButton({
         href: "admin.html",
         icon: "admin",
-        title: "ממשק ניהול",
-        subtitle: "ניהול הרצאות, פתיחה וסגירה של סקרים",
+        title: t("nav_admin"),
+        subtitle: t("admin_panel_sub"),
         primary: true
       }),
       actionButton({
         href: "voter.html",
         icon: "vote",
-        title: "עמוד הצבעות",
-        subtitle: "צפייה והצבעה כמו משתמש רגיל"
+        title: t("nav_voter"),
+        subtitle: t("view_and_vote_as_regular")
       })
     ].join("");
   } else {
@@ -76,8 +77,8 @@ if (actions) {
     actions.innerHTML = actionButton({
       href: "voter.html",
       icon: "vote",
-      title: "לעמוד הצבעות",
-      subtitle: "צפייה בהרצאות והצבעה בסקרים פתוחים",
+      title: t("to_voting_page"),
+      subtitle: t("view_and_vote"),
       primary: true
     });
   }
