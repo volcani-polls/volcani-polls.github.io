@@ -134,7 +134,7 @@ async function submitVote(questions) {
       answers
     });
     showMessage(message, t("vote_saved_success"), "success");
-    setTimeout(() => window.location.href = "voter.html", 900);
+    setTimeout(() => window.location.href = "voter.html", 1200);
   } catch (err) {
     console.error(err);
     showMessage(message, t("vote_save_failed"), "error");

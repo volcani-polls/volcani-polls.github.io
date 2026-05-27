@@ -9,7 +9,9 @@ const translations = {
     nav_results: "תוצאות",
     loading: "טוען...",
     login: "התחברות",
+    login_page: "עמוד התחברות",
     register: "הרשמה",
+    register_page: "עמוד הרשמה",
     email: "כתובת מייל",
     password: "סיסמה",
     confirm_password: "אימות סיסמה",
@@ -17,6 +19,7 @@ const translations = {
     dont_have_user: "אין לך משתמש? ",
     password_label_rules: "סיסמה (לפחות 6 תווים)",
     allowed_emails_note: "הגישה מותרת רק למיילים שמסתיימים ב־@volcani.agri.gov.il",
+    register_only_volcani: "ניתן להירשם רק עם מייל ארגוני של מכון וולקני",
     submit: "שליחה",
     save: "שמירה",
     delete: "הסר",
@@ -145,7 +148,9 @@ const translations = {
     nav_results: "Results",
     loading: "Loading...",
     login: "Login",
+    login_page: "Login Page",
     register: "Register",
+    register_page: "Registration Page",
     email: "Email Address",
     password: "Password",
     confirm_password: "Confirm Password",
@@ -153,6 +158,7 @@ const translations = {
     dont_have_user: "Don't have an account? ",
     password_label_rules: "Password (at least 6 characters)",
     allowed_emails_note: "Access allowed only for emails ending with @volcani.agri.gov.il",
+    register_only_volcani: "Registration is only available with a Volcani Institute organizational email",
     submit: "Submit",
     save: "Save",
     delete: "Remove",
@@ -340,6 +346,23 @@ document.addEventListener("DOMContentLoaded", () => {
   injectLangToggle();
   setupHamburgerMenu();
   setupPageTransitions();
+  
+  // Hide the loading overlay with fade-out
+  const overlay = document.getElementById("pageTransitionOverlay");
+  if (overlay && overlay.classList.contains("active")) {
+    overlay.classList.remove("show");
+    setTimeout(() => {
+      overlay.classList.remove("active");
+    }, 300);
+  }
+  
+  // Show the page after everything is loaded
+  requestAnimationFrame(() => {
+    document.body.classList.add("loaded");
+  });
+  
+  // Create page transition overlay
+  createPageTransitionOverlay();
 });
 
 function setupHamburgerMenu() {
@@ -393,6 +416,15 @@ function setupPageTransitions() {
 
     e.preventDefault();
 
+    // Show loading overlay with fade-in
+    const overlay = document.getElementById("pageTransitionOverlay");
+    if (overlay) {
+      overlay.classList.add("active");
+      requestAnimationFrame(() => {
+        overlay.classList.add("show");
+      });
+    }
+
     const transitionEls = document.querySelectorAll(".page-transition");
     if (transitionEls.length) {
       transitionEls.forEach(el => {
@@ -401,11 +433,21 @@ function setupPageTransitions() {
       });
       setTimeout(() => {
         window.location.href = href;
-      }, 200);
+      }, 300);
     } else {
       window.location.href = href;
     }
   });
+}
+
+function createPageTransitionOverlay() {
+  if (document.getElementById("pageTransitionOverlay")) return;
+  
+  const overlay = document.createElement("div");
+  overlay.id = "pageTransitionOverlay";
+  overlay.className = "page-transition-overlay";
+  overlay.innerHTML = '<div class="page-transition-spinner"></div>';
+  document.body.appendChild(overlay);
 }
 
 function injectLangToggle() {
@@ -479,6 +521,16 @@ function injectLangToggle() {
 
 function triggerLanguageSwitch(nextLang) {
   setLang(nextLang);
+  
+  // Show loading overlay with fade-in
+  const overlay = document.getElementById("pageTransitionOverlay");
+  if (overlay) {
+    overlay.classList.add("active");
+    requestAnimationFrame(() => {
+      overlay.classList.add("show");
+    });
+  }
+  
   const transitionEls = document.querySelectorAll(".page-transition, main, .auth-card, section.welcome-panel");
   if (transitionEls.length) {
     transitionEls.forEach(el => {
@@ -487,7 +539,7 @@ function triggerLanguageSwitch(nextLang) {
     });
     setTimeout(() => {
       location.reload();
-    }, 200);
+    }, 300);
   } else {
     location.reload();
   }
