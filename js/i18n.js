@@ -351,22 +351,25 @@ document.addEventListener("DOMContentLoaded", () => {
   setupHamburgerMenu();
   setupPageTransitions();
   
-  // Hide the loading overlay with fade-out
+  // Hide the loading overlay with a smooth fade-out
   const overlay = document.getElementById("pageTransitionOverlay");
   if (overlay && overlay.classList.contains("active")) {
-    overlay.classList.remove("show");
-    setTimeout(() => {
-      overlay.classList.remove("active");
-    }, 300);
-  }
-  
-  // Show the page after everything is loaded
-  requestAnimationFrame(() => {
+    // First show the page content behind the overlay
     document.body.classList.add("loaded");
-  });
-  
-  // Create page transition overlay
-  createPageTransitionOverlay();
+    // Then fade out the overlay smoothly
+    requestAnimationFrame(() => {
+      overlay.classList.remove("show");
+      // After CSS transition completes, fully hide the overlay
+      overlay.addEventListener("transitionend", () => {
+        overlay.classList.remove("active");
+      }, { once: true });
+    });
+  } else {
+    // No overlay active, just show the page
+    requestAnimationFrame(() => {
+      document.body.classList.add("loaded");
+    });
+  }
 });
 
 function setupHamburgerMenu() {
@@ -445,12 +448,13 @@ function setupPageTransitions() {
 }
 
 function createPageTransitionOverlay() {
+  // Overlay is now embedded directly in HTML for instant visibility.
+  // This fallback only runs if somehow the HTML overlay is missing.
   if (document.getElementById("pageTransitionOverlay")) return;
-  
   const overlay = document.createElement("div");
   overlay.id = "pageTransitionOverlay";
   overlay.className = "page-transition-overlay";
-  overlay.innerHTML = '<div class="page-transition-spinner"></div>';
+  overlay.innerHTML = '<img src="assets/Volcani_W.png" alt="" class="page-transition-logo">';
   document.body.appendChild(overlay);
 }
 
