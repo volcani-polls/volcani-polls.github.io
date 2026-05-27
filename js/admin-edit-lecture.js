@@ -114,7 +114,7 @@ form.addEventListener("submit", async (event) => {
       });
     }
     showMessage(message, t("poll_saved"), "success");
-    setTimeout(() => window.location.href = "admin.html", 1000);
+    setTimeout(() => window.location.href = "admin.html", 300);
   } catch (err) {
     console.error(err);
     showMessage(message, t("poll_save_failed"), "error");

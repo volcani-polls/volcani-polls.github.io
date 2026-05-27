@@ -21,6 +21,7 @@ const translations = {
     allowed_emails_note: "במקרה של תקלות ניתן לפנות ל yehudah@volcani.agri.gov.il",
     support_contact: "במקרה של תקלות ניתן לפנות ל yehudah@volcani.agri.gov.il",
     vote_slogan: "מי שמצביע - משפיע!",
+    page_loading: "מועבר לעמוד...",
     register_only_volcani: "ניתן להירשם רק עם כתובת מייל של מכון וולקני",
     submit: "שליחה",
     save: "שמירה",
@@ -92,9 +93,8 @@ const translations = {
     voters_column: "מספר מדרגים",
     average_column: "ממוצע",
     owner_prefix: "Owner של המערכת:",
-    admins_panel_info_title: "אודות מנהלים",
-    admins_panel_info_desc_1: "הגדרת רשימת המנהלים מתבצעת על ידי ה-Owner ב-Firebase Realtime Database תחת config/adminEmailsCsv או ישירות ב-Rules.",
-    admins_panel_info_desc_2: "שינויים ייכנסו לתוקף מיד ללא צורך בפריסה מחדש של האתר.",
+    admins_panel_info_title: "הגדרות מנהלים",
+    admins_panel_info_desc_1: "מנהלים מוגדרים על ידי מפתח המערכת yehudah@volcani.agri.gov.il",
     admins_list_title: "מנהלים מורשים",
     domain_error_msg: "הגישה מותרת רק עם כתובת מייל של מכון וולקני.",
     login_domain_constraint: "ניתן להתחבר רק עם כתובת מייל שמסתיימת ב־@volcani.agri.gov.il",
@@ -108,8 +108,8 @@ const translations = {
     email_in_use_error: "כתובת המייל כבר רשומה. עבור למסך התחברות.",
     weak_password_error: "הסיסמה חלשה מדי.",
     lectures_load_error: "שגיאה בטעינת ההרצאות.",
-    owner_rules_label: "Owner / Rules",
-    csv_label: "config/adminEmailsCsv",
+    owner_rules_label: "ADMIN",
+    csv_label: "ADMIN",
     
     // Landing page translations
     landing_brand: "המכון להנדסה חקלאית וביולוגית",
@@ -162,6 +162,7 @@ const translations = {
     allowed_emails_note: "Access allowed only for emails ending with @volcani.agri.gov.il",
     support_contact: "In case of issues, please contact yehudah@volcani.agri.gov.il",
     vote_slogan: "Those who vote - make an impact!",
+    page_loading: "Navigating to page...",
     register_only_volcani: "Registration is only available with a Volcani Institute email address",
     submit: "Submit",
     save: "Save",
@@ -233,9 +234,8 @@ const translations = {
     voters_column: "Raters Count",
     average_column: "Average",
     owner_prefix: "System Owner:",
-    admins_panel_info_title: "About Admins",
-    admins_panel_info_desc_1: "Defining the admin list is done by the Owner in the Firebase Realtime Database under config/adminEmailsCsv or directly in the Rules.",
-    admins_panel_info_desc_2: "Changes take effect immediately without needing to redeploy the site.",
+    admins_panel_info_title: "Admin Settings",
+    admins_panel_info_desc_1: "Admins are defined by the system developer yehudah@volcani.agri.gov.il",
     admins_list_title: "Authorized Admins",
     domain_error_msg: "Access is allowed only with a Volcani Institute email address.",
     login_domain_constraint: "You can only log in with an email address ending with @volcani.agri.gov.il",
@@ -249,8 +249,8 @@ const translations = {
     email_in_use_error: "Email address is already registered. Go to login screen.",
     weak_password_error: "The password is too weak.",
     lectures_load_error: "Error loading lectures.",
-    owner_rules_label: "Owner / Rules",
-    csv_label: "config/adminEmailsCsv",
+    owner_rules_label: "ADMIN",
+    csv_label: "ADMIN",
     
     // Landing page translations
     landing_brand: "Institute of Ag. & Bio. Engineering",
@@ -351,25 +351,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupHamburgerMenu();
   setupPageTransitions();
   
-  // Hide the loading overlay with a smooth fade-out
-  const overlay = document.getElementById("pageTransitionOverlay");
-  if (overlay && overlay.classList.contains("active")) {
-    // First show the page content behind the overlay
-    document.body.classList.add("loaded");
-    // Then fade out the overlay smoothly
-    requestAnimationFrame(() => {
-      overlay.classList.remove("show");
-      // After CSS transition completes, fully hide the overlay
-      overlay.addEventListener("transitionend", () => {
-        overlay.classList.remove("active");
-      }, { once: true });
-    });
-  } else {
-    // No overlay active, just show the page
-    requestAnimationFrame(() => {
-      document.body.classList.add("loaded");
-    });
-  }
+  document.body.classList.add("loaded");
 });
 
 function setupHamburgerMenu() {
@@ -408,54 +390,46 @@ function setupHamburgerMenu() {
 }
 
 function setupPageTransitions() {
-  // Intercept all internal navigation links for fade-out effect
   document.addEventListener("click", (e) => {
     const link = e.target.closest("a[href]");
     if (!link) return;
-
     const href = link.getAttribute("href");
-    // Skip external, hash, or JS links
     if (!href || href.startsWith("http") || href.startsWith("#") || href.startsWith("javascript")) return;
-    // Skip if modifier key held (open in new tab etc.)
     if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
-    // Skip if link opens in new tab
     if (link.target === "_blank") return;
-
     e.preventDefault();
-
-    // Show loading overlay with fade-in
-    const overlay = document.getElementById("pageTransitionOverlay");
-    if (overlay) {
-      overlay.classList.add("active");
-      requestAnimationFrame(() => {
-        overlay.classList.add("show");
-      });
-    }
-
+    
+    // Show loading overlay immediately
+    showLoadingOverlay();
+    
     const transitionEls = document.querySelectorAll(".page-transition");
     if (transitionEls.length) {
       transitionEls.forEach(el => {
         el.classList.remove("page-transition");
         el.classList.add("page-exit");
       });
-      setTimeout(() => {
-        window.location.href = href;
-      }, 300);
+      setTimeout(() => { window.location.href = href; }, 80);
     } else {
       window.location.href = href;
     }
   });
 }
 
-function createPageTransitionOverlay() {
-  // Overlay is now embedded directly in HTML for instant visibility.
-  // This fallback only runs if somehow the HTML overlay is missing.
-  if (document.getElementById("pageTransitionOverlay")) return;
-  const overlay = document.createElement("div");
-  overlay.id = "pageTransitionOverlay";
-  overlay.className = "page-transition-overlay";
-  overlay.innerHTML = '<img src="assets/Volcani_W.png" alt="" class="page-transition-logo">';
-  document.body.appendChild(overlay);
+function showLoadingOverlay() {
+  // Create overlay if it doesn't exist
+  let overlay = document.getElementById("page-loading-overlay");
+  if (!overlay) {
+    overlay = document.createElement("div");
+    overlay.id = "page-loading-overlay";
+    overlay.className = "page-transition-overlay active";
+    overlay.innerHTML = `
+      <p class="spinner-text page-transition-text" data-i18n="page_loading">${t("page_loading")}</p>
+    `;
+    document.body.appendChild(overlay);
+  }
+  // Force reflow and show
+  overlay.offsetHeight;
+  overlay.classList.add("show");
 }
 
 function injectLangToggle() {
@@ -530,14 +504,8 @@ function injectLangToggle() {
 function triggerLanguageSwitch(nextLang) {
   setLang(nextLang);
   
-  // Show loading overlay with fade-in
-  const overlay = document.getElementById("pageTransitionOverlay");
-  if (overlay) {
-    overlay.classList.add("active");
-    requestAnimationFrame(() => {
-      overlay.classList.add("show");
-    });
-  }
+  // Show loading overlay immediately
+  showLoadingOverlay();
   
   const transitionEls = document.querySelectorAll(".page-transition, main, .auth-card, section.welcome-panel");
   if (transitionEls.length) {
@@ -545,9 +513,7 @@ function triggerLanguageSwitch(nextLang) {
       el.classList.remove("page-transition");
       el.classList.add("page-exit");
     });
-    setTimeout(() => {
-      location.reload();
-    }, 300);
+    setTimeout(() => { location.reload(); }, 80);
   } else {
     location.reload();
   }
