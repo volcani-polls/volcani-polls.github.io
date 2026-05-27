@@ -9,7 +9,10 @@ wireLogoutButtons();
 const adminEmail = $("#adminEmail");
 const list = $("#adminLecturesList");
 const message = $("#message");
-if (adminEmail) adminEmail.textContent = user?.email || "";
+if (adminEmail) {
+  const emailPrefix = user?.email ? user.email.split("@")[0] : "";
+  adminEmail.textContent = emailPrefix;
+}
 
 async function loadLectures() {
   list.innerHTML = `<div class="loading-box">${t("loading_lectures")}</div>`;

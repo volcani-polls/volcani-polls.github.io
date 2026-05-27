@@ -10,7 +10,10 @@ const list = $("#lecturesList");
 const adminLink = $("#adminLink");
 const userEmail = $("#userEmail");
 
-if (userEmail) userEmail.textContent = user?.email || "";
+if (userEmail) {
+  const emailPrefix = user?.email ? user.email.split("@")[0] : "";
+  userEmail.textContent = emailPrefix;
+}
 
 if (await isAdminUser(user).catch(() => false)) {
   adminLink.hidden = false;

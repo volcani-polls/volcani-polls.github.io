@@ -56,18 +56,21 @@ async function loadSurvey() {
   }
 
   form.innerHTML = questions.map(([qid, q], index) => `
-    <fieldset class="question-card" data-question-id="${escapeHtml(qid)}">
-      <legend>${index + 1}. ${escapeHtml(q.text)}</legend>
-      <div class="rating-help"><span>${t("rating_low")}</span><span>${t("rating_high")}</span></div>
+    <div class="question-card" data-question-id="${escapeHtml(qid)}">
+      <p class="question-text"><span class="question-num">${index + 1}</span><span class="question-content">${escapeHtml(q.text)}</span></p>
+      <div class="rating-scale-labels">
+        <span>👎 ${t("rating_scale_low")}</span>
+        <span>${t("rating_scale_high")} 👍</span>
+      </div>
       <div class="rating-grid" role="radiogroup" aria-label="${escapeHtml(q.text)}">
         ${[1, 2, 3, 4, 5].map((value) => `
           <label class="rating-option">
             <input type="radio" name="q_${escapeHtml(qid)}" value="${value}" required>
-            <span>${ratingLabel(value)}</span>
+            <span>${value}</span>
           </label>
         `).join("")}
       </div>
-    </fieldset>
+    </div>
   `).join("") + `
     <button id="submitVoteBtn" class="btn primary full" type="submit">${t("send_vote")}</button>
   `;

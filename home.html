@@ -10,16 +10,16 @@
   <header class="topbar">
     <a class="logo" href="home.html"><span>V</span> Volcani Polls</a>
     <nav>
-      <a href="home.html">דף הבית</a>
-      <button class="btn link" data-logout type="button">יציאה</button>
+      <a href="home.html" data-i18n="nav_home">דף הבית</a>
+      <button class="btn link" data-logout type="button" data-i18n="nav_logout">יציאה</button>
     </nav>
   </header>
 
-  <main class="container narrow">
+  <main class="container narrow page-transition">
     <section class="welcome-panel">
-      <p class="welcome-kicker">ברוך הבא</p>
+      <p class="welcome-kicker" data-i18n="welcome_back">ברוכ/ה הבא/ה</p>
       <h1 id="welcomeTitle">טוען...</h1>
-      <p id="roleBadge" class="role-badge" hidden>את/ה מנהל/ת</p>
+      <p id="roleBadge" class="role-badge" data-i18n="you_are_admin" hidden>את/ה מנהל/ת</p>
       <p id="welcomeSubtitle" class="muted welcome-subtitle" hidden>בחר את המסלול שתרצה/י להמשיך אליו.</p>
       <div id="welcomeActions" class="welcome-actions"></div>
     </section>

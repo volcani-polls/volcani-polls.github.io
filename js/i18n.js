@@ -32,7 +32,7 @@ const translations = {
     save_lecture: "שמור הרצאה",
     back_to_admin: "חזרה לממשק ניהול",
     back_to_voter: "חזרה לעמוד הצבעות",
-    welcome_back: "ברוך הבא",
+    welcome_back: "ברוכ/ה הבא/ה",
     hello: "שלום",
     you_are_admin: "את/ה מנהל/ת",
     choose_path: "בחר את המסלול שתרצה/י להמשיך אליו.",
@@ -65,6 +65,8 @@ const translations = {
     no_questions_in_survey: "בסקר זה עדיין אין שאלות.",
     rating_low: "👎 1 = הכי נמוך",
     rating_high: "5 = הכי גבוה 👍",
+    rating_scale_low: "הכי נמוך",
+    rating_scale_high: "הכי גבוה",
     send_vote: "שלח הצבעה",
     sending: "שולח...",
     vote_saved_success: "ההצבעה נשמרה בהצלחה. תודה!",
@@ -197,6 +199,8 @@ const translations = {
     no_questions_in_survey: "This poll does not have questions yet.",
     rating_low: "👎 1 = Lowest",
     rating_high: "5 = Highest 👍",
+    rating_scale_low: "Lowest",
+    rating_scale_high: "Highest",
     send_vote: "Submit Vote",
     sending: "Sending...",
     vote_saved_success: "Vote submitted successfully. Thank you!",
@@ -320,7 +324,7 @@ export function translateDOM() {
   });
 }
 
-// Add the page load transition and inject the language toggle button
+// Add the page load transition, inject the language toggle, and setup the hamburger menu
 document.addEventListener("DOMContentLoaded", () => {
   // Apply page transitions
   const mainContainers = document.querySelectorAll("main, .auth-card, section.welcome-panel");
@@ -330,7 +334,75 @@ document.addEventListener("DOMContentLoaded", () => {
 
   translateDOM();
   injectLangToggle();
+  setupHamburgerMenu();
+  setupPageTransitions();
 });
+
+function setupHamburgerMenu() {
+  const topbar = document.querySelector(".topbar");
+  const nav = document.querySelector(".topbar nav");
+  
+  if (topbar && nav) {
+    if (document.getElementById("hamburgerBtn")) return;
+    
+    const hamburger = document.createElement("button");
+    hamburger.type = "button";
+    hamburger.className = "hamburger-btn";
+    hamburger.id = "hamburgerBtn";
+    hamburger.setAttribute("aria-label", "Toggle navigation menu");
+    hamburger.innerHTML = '<i class="fa-solid fa-bars"></i>';
+    
+    topbar.insertBefore(hamburger, nav);
+    
+    hamburger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = nav.classList.toggle("open");
+      hamburger.innerHTML = isOpen 
+        ? '<i class="fa-solid fa-xmark"></i>' 
+        : '<i class="fa-solid fa-bars"></i>';
+    });
+    
+    document.addEventListener("click", (e) => {
+      if (!nav.contains(e.target) && !hamburger.contains(e.target)) {
+        if (nav.classList.contains("open")) {
+          nav.classList.remove("open");
+          hamburger.innerHTML = '<i class="fa-solid fa-bars"></i>';
+        }
+      }
+    });
+  }
+}
+
+function setupPageTransitions() {
+  // Intercept all internal navigation links for fade-out effect
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest("a[href]");
+    if (!link) return;
+
+    const href = link.getAttribute("href");
+    // Skip external, hash, or JS links
+    if (!href || href.startsWith("http") || href.startsWith("#") || href.startsWith("javascript")) return;
+    // Skip if modifier key held (open in new tab etc.)
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    // Skip if link opens in new tab
+    if (link.target === "_blank") return;
+
+    e.preventDefault();
+
+    const transitionEls = document.querySelectorAll(".page-transition");
+    if (transitionEls.length) {
+      transitionEls.forEach(el => {
+        el.classList.remove("page-transition");
+        el.classList.add("page-exit");
+      });
+      setTimeout(() => {
+        window.location.href = href;
+      }, 200);
+    } else {
+      window.location.href = href;
+    }
+  });
+}
 
 function injectLangToggle() {
   const lang = getLang();
@@ -351,8 +423,7 @@ function injectLangToggle() {
     btn.innerHTML = `<i class="fa-solid fa-globe"></i> ${btnText}`;
     btn.style.marginInlineStart = "8px";
     btn.addEventListener("click", () => {
-      setLang(nextLang);
-      location.reload();
+      triggerLanguageSwitch(nextLang);
     });
     topNav.appendChild(btn);
   } else if (landingNav) {
@@ -367,8 +438,7 @@ function injectLangToggle() {
     btn.className = "px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-bold text-xs md:text-sm border border-white/15 transition-all duration-300 flex items-center gap-2 lang-toggle-btn";
     btn.innerHTML = `<i class="fa-solid fa-globe"></i> <span>${btnText}</span>`;
     btn.addEventListener("click", () => {
-      setLang(nextLang);
-      location.reload();
+      triggerLanguageSwitch(nextLang);
     });
     
     const lastElement = landingNav.lastElementChild;
@@ -396,10 +466,25 @@ function injectLangToggle() {
     btn.style.zIndex = "100";
     
     btn.addEventListener("click", () => {
-      setLang(nextLang);
-      location.reload();
+      triggerLanguageSwitch(nextLang);
     });
     
     document.body.appendChild(btn);
+  }
+}
+
+function triggerLanguageSwitch(nextLang) {
+  setLang(nextLang);
+  const transitionEls = document.querySelectorAll(".page-transition, main, .auth-card, section.welcome-panel");
+  if (transitionEls.length) {
+    transitionEls.forEach(el => {
+      el.classList.remove("page-transition");
+      el.classList.add("page-exit");
+    });
+    setTimeout(() => {
+      location.reload();
+    }, 200);
+  } else {
+    location.reload();
   }
 }

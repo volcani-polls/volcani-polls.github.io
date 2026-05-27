@@ -42,7 +42,8 @@ function actionButton({ href, icon, title, subtitle, primary = false }) {
 }
 
 if (welcomeTitle) {
-  welcomeTitle.textContent = `${t("hello")} ${user?.email || ""}`;
+  const emailPrefix = user?.email ? user.email.split("@")[0] : "";
+  welcomeTitle.textContent = `${t("hello")} ${emailPrefix}`;
 }
 
 const admin = await isAdminUser(user).catch(() => false);
