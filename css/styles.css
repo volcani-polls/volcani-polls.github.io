@@ -68,6 +68,19 @@ a:hover { text-decoration: none; color: var(--primary-dark); }
 .brand h1 { margin: 0; font-size: 28px; }
 .brand p { margin: 4px 0 0; color: var(--muted); }
 
+.vote-slogan {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 20px 0 24px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, rgba(47, 125, 50, 0.08) 0%, rgba(47, 125, 50, 0.12) 100%);
+  border-radius: 12px;
+  border: 2px solid rgba(47, 125, 50, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
 .form { display: grid; gap: 16px; }
 .form label { display: grid; gap: 7px; font-weight: 700; }
 input, select, textarea {
@@ -129,7 +142,21 @@ input:focus, textarea:focus {
 .message.info { background: #f2f6ff; border-color: #d9e4ff; color: #204a87; }
 
 .auth-switch, .tiny-note { text-align: center; color: var(--muted); }
-.tiny-note { font-size: 13px; }
+.auth-switch { margin-top: 20px; }
+.auth-link {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: underline;
+  transition: color 0.2s ease, transform 0.2s ease;
+  display: inline-block;
+}
+.auth-link:hover {
+  color: var(--primary-dark);
+  transform: translateY(-1px);
+  text-decoration: underline;
+}
+.tiny-note { font-size: 13px; margin-top: 12px; }
 
 .topbar {
   position: sticky;

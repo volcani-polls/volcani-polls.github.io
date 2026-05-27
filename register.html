@@ -21,6 +21,8 @@
       </div>
     </div>
 
+    <p class="vote-slogan" data-i18n="vote_slogan">מי שמצביע - משפיע!</p>
+
     <form id="registerForm" class="form">
       <p class="tiny-note" style="margin-bottom: 12px; margin-top: 0;" data-i18n="register_only_volcani">ניתן להירשם רק עם מייל ארגוני של מכון וולקני</p>
       <label>
@@ -50,11 +52,13 @@
 
     <div id="message" class="message" hidden></div>
 
-    <p class="auth-switch">
-      <span data-i18n="already_have_user">כבר יש לך משתמש? </span>
-      <a href="login.html" data-i18n="login">להתחברות</a>
-    </p>
-    <p class="tiny-note" data-i18n="allowed_emails_note">הגישה מותרת רק למיילים שמסתיימים ב־@volcani.agri.gov.il</p>
+    <div class="auth-switch">
+      <p style="margin-bottom: 8px;">
+        <span data-i18n="already_have_user">כבר יש לך משתמש? </span>
+      </p>
+      <a href="login.html" class="auth-link" data-i18n="login">להתחברות</a>
+    </div>
+    <p class="tiny-note" data-i18n="support_contact">במקרה של תקלות ניתן לפנות ל yehudah@volcani.agri.gov.il</p>
   </main>
   <script type="module" src="js/register.js"></script>
 </body>
