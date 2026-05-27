@@ -22,15 +22,25 @@
     <form id="registerForm" class="form">
       <label>
         <span data-i18n="email">כתובת מייל</span>
-        <input id="email" type="email" autocomplete="email" placeholder="username@volcani.agri.gov.il" required>
+        <input id="email" type="email" autocomplete="email" placeholder="username@volcani.agri.gov.il" autocapitalize="none" autocorrect="off" spellcheck="false" required>
       </label>
       <label>
         <span data-i18n="password_label_rules">סיסמה (לפחות 6 תווים)</span>
-        <input id="password" type="password" autocomplete="new-password" required>
+        <div class="password-wrapper">
+          <input id="password" type="password" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+          <button type="button" id="togglePassword" class="password-toggle" aria-label="Toggle password visibility">
+            <i class="fa-regular fa-eye"></i>
+          </button>
+        </div>
       </label>
       <label>
         <span data-i18n="confirm_password">אימות סיסמה</span>
-        <input id="password2" type="password" autocomplete="new-password" required>
+        <div class="password-wrapper">
+          <input id="password2" type="password" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+          <button type="button" id="togglePassword2" class="password-toggle" aria-label="Toggle password visibility">
+            <i class="fa-regular fa-eye"></i>
+          </button>
+        </div>
       </label>
       <button id="registerBtn" class="btn primary full" type="submit" data-i18n="register">הרשמה</button>
     </form>

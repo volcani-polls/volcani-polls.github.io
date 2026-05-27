@@ -42,9 +42,34 @@ form?.addEventListener("submit", async (event) => {
     console.error(err);
     let msg = t("register_failed");
     if (err.code === "auth/email-already-in-use") msg = t("email_in_use_error");
-    if (err.code === "auth/weak-password") msg = t("weak_password_error");
+    else if (err.code === "auth/weak-password") msg = t("weak_password_error");
+    else if (err.code === "auth/network-request-failed") msg = t("network_error_msg");
+    else if (err.code === "auth/too-many-requests") msg = t("too_many_requests_msg");
     showMessage(message, msg, "error");
   } finally {
     setLoading(submitBtn, false);
   }
 });
+
+// Wire up password show/hide toggles
+function wirePasswordToggle(toggleId, inputId) {
+  const toggleBtn = $(toggleId);
+  const input = $(inputId);
+  if (toggleBtn && input) {
+    toggleBtn.addEventListener("click", () => {
+      const icon = toggleBtn.querySelector("i");
+      if (icon) {
+        if (input.type === "password") {
+          input.type = "text";
+          icon.className = "fa-regular fa-eye-slash";
+        } else {
+          input.type = "password";
+          icon.className = "fa-regular fa-eye";
+        }
+      }
+    });
+  }
+}
+
+wirePasswordToggle("#togglePassword", "#password");
+wirePasswordToggle("#togglePassword2", "#password2");

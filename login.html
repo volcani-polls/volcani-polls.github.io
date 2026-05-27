@@ -22,11 +22,16 @@
     <form id="loginForm" class="form">
       <label>
         <span data-i18n="email">כתובת מייל</span>
-        <input id="email" type="email" autocomplete="email" placeholder="username@volcani.agri.gov.il" required>
+        <input id="email" type="email" autocomplete="email" placeholder="username@volcani.agri.gov.il" autocapitalize="none" autocorrect="off" spellcheck="false" required>
       </label>
       <label>
         <span data-i18n="password">סיסמה</span>
-        <input id="password" type="password" autocomplete="current-password" required>
+        <div class="password-wrapper">
+          <input id="password" type="password" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" required>
+          <button type="button" id="togglePassword" class="password-toggle" aria-label="Toggle password visibility">
+            <i class="fa-regular fa-eye"></i>
+          </button>
+        </div>
       </label>
       <button id="loginBtn" class="btn primary full" type="submit" data-i18n="login">התחברות</button>
     </form>

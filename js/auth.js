@@ -36,17 +36,48 @@ form?.addEventListener("submit", async (event) => {
   try {
     setLoading(submitBtn, true);
     const credential = await signInWithEmailAndPassword(auth, email, password);
-    await update(ref(db, `users/${credential.user.uid}`), {
-      email,
-      lastLoginAt: Date.now()
-    });
+    
+    // Non-blocking database update to prevent DB rule issues from blocking successful logins
+    try {
+      await update(ref(db, `users/${credential.user.uid}`), {
+        email,
+        lastLoginAt: Date.now()
+      });
+    } catch (dbErr) {
+      console.warn("Non-blocking DB metadata update failed:", dbErr);
+    }
+    
     window.location.href = "home.html";
   } catch (err) {
     console.error(err);
-    showMessage(message, t("login_failed_msg"), "error");
+    let errorMsg = t("login_failed_msg");
+    if (err.code === "auth/network-request-failed") {
+      errorMsg = t("network_error_msg");
+    } else if (err.code === "auth/too-many-requests") {
+      errorMsg = t("too_many_requests_msg");
+    }
+    showMessage(message, errorMsg, "error");
   } finally {
     setLoading(submitBtn, false);
   }
 });
+
+// Password Show/Hide Toggle
+const passwordToggleBtn = $("#togglePassword");
+if (passwordToggleBtn) {
+  passwordToggleBtn.addEventListener("click", () => {
+    const passwordInput = $("#password");
+    const eyeIcon = passwordToggleBtn.querySelector("i");
+    if (passwordInput && eyeIcon) {
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        eyeIcon.className = "fa-regular fa-eye-slash";
+      } else {
+        passwordInput.type = "password";
+        eyeIcon.className = "fa-regular fa-eye";
+      }
+    }
+  });
+}
 
 redirectIfAlreadyLoggedIn();

@@ -531,3 +531,31 @@ html[dir="ltr"] .vote-status {
     padding: 8px 0;
   }
 }
+
+/* Password Visibility Toggle Styles */
+.password-wrapper {
+  position: relative;
+  display: block;
+}
+.password-wrapper input {
+  padding-inline-end: 44px !important;
+}
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  inset-inline-end: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  transition: color 0.2s ease;
+  z-index: 10;
+}
+.password-toggle:hover {
+  color: var(--primary);
+}
