@@ -70,24 +70,26 @@ onValue(ref(db, "lectures"), async (snapshot) => {
       const previousState = previousLectureStates[lectureId];
       
       if (previousState !== undefined) {
-        // Poll was opened
+        // Poll was opened - GREEN
         if (!previousState && lecture.isOpen === true) {
           showToast({
             title: t("poll_opened_toast_title"),
             message: `${lecture.title}`,
             type: "success",
             icon: '<i class="fa-solid fa-lock-open"></i>',
-            duration: 4000
+            duration: 4000,
+            playSound: true
           });
         }
-        // Poll was closed
+        // Poll was closed - RED
         else if (previousState && lecture.isOpen === false) {
           showToast({
             title: t("poll_closed_toast_title"),
             message: `${lecture.title}`,
-            type: "info",
+            type: "danger",
             icon: '<i class="fa-solid fa-lock"></i>',
-            duration: 4000
+            duration: 4000,
+            playSound: true
           });
         }
       }

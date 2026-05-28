@@ -384,6 +384,7 @@ document.addEventListener("DOMContentLoaded", () => {
   injectLangToggle();
   setupHamburgerMenu();
   setupPageTransitions();
+  setupGlobalPollStatusListener();
   
   document.body.classList.add("loaded");
 });
@@ -551,4 +552,65 @@ function triggerLanguageSwitch(nextLang) {
   } else {
     location.reload();
   }
+}
+
+
+// Global poll status listener - works on all pages
+function setupGlobalPollStatusListener() {
+  // Only run on pages that are not login/register/index
+  const currentPage = window.location.pathname.split('/').pop();
+  const excludedPages = ['login.html', 'register.html', 'index.html', ''];
+  
+  if (excludedPages.includes(currentPage)) {
+    return;
+  }
+  
+  // Dynamically import Firebase and utils only when needed
+  import('./firebase-init.js').then(({ db }) => {
+    import('https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js').then(({ ref, onValue }) => {
+      import('./utils.js').then(({ showToast }) => {
+        
+        let previousStates = {};
+        
+        // Listen to all lectures for status changes
+        onValue(ref(db, 'lectures'), (snapshot) => {
+          const lectures = snapshot.val() || {};
+          
+          Object.entries(lectures).forEach(([lectureId, lecture]) => {
+            const previousState = previousStates[lectureId];
+            
+            // Only show toast if state actually changed (not on initial load)
+            if (previousState !== undefined && previousState !== lecture.isOpen) {
+              
+              if (lecture.isOpen === true) {
+                // Poll opened - GREEN with sound
+                showToast({
+                  title: t("poll_opened_toast_title"),
+                  message: `${lecture.title}`,
+                  type: "success",
+                  icon: '<i class="fa-solid fa-lock-open"></i>',
+                  duration: 5000,
+                  playSound: true
+                });
+              } else {
+                // Poll closed - RED with sound
+                showToast({
+                  title: t("poll_closed_toast_title"),
+                  message: `${lecture.title}`,
+                  type: "danger",
+                  icon: '<i class="fa-solid fa-lock"></i>',
+                  duration: 5000,
+                  playSound: true
+                });
+              }
+            }
+            
+            // Update state
+            previousStates[lectureId] = lecture.isOpen;
+          });
+        });
+        
+      }).catch(err => console.warn('Could not load utils for global listener:', err));
+    }).catch(err => console.warn('Could not load Firebase for global listener:', err));
+  }).catch(err => console.warn('Could not load Firebase init for global listener:', err));
 }

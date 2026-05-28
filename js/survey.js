@@ -75,9 +75,10 @@ async function loadSurvey() {
       showToast({
         title: t("poll_closed_toast_title"),
         message: lecture.title,
-        type: "warning",
+        type: "danger",
         icon: '<i class="fa-solid fa-lock"></i>',
-        duration: 6000
+        duration: 6000,
+        playSound: true
       });
       
       // Add a button to go back to voter page

@@ -214,16 +214,73 @@ function getToastContainer() {
   return toastContainer;
 }
 
+// Play notification sound
+function playNotificationSound(type) {
+  try {
+    // Create audio context for better browser support
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.type = 'sine'; // Smooth sine wave
+    
+    // Different sounds for different types
+    if (type === "success") {
+      // Happy ascending tone for poll opened (3 notes going up)
+      oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+      oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.08); // E5
+      oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.16); // G5
+      
+      gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+      gainNode.gain.setValueAtTime(0.4, audioContext.currentTime + 0.08);
+      gainNode.gain.setValueAtTime(0.4, audioContext.currentTime + 0.16);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.4);
+    } else if (type === "danger" || type === "error") {
+      // Alert descending tone for poll closed (2 notes going down)
+      oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
+      oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime + 0.12); // C5
+      
+      gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+      gainNode.gain.setValueAtTime(0.4, audioContext.currentTime + 0.12);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.35);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.35);
+    } else {
+      // Simple beep for other notifications
+      oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.25);
+    }
+  } catch (err) {
+    console.warn("Could not play notification sound:", err);
+  }
+}
+
 export function showToast(options) {
   const {
     title = "",
     message = "",
-    type = "info", // success, info, warning, error
+    type = "info", // success, info, warning, error, danger
     duration = 4000,
-    icon = null
+    icon = null,
+    playSound = true
   } = options;
 
   const container = getToastContainer();
+  
+  // Play sound if enabled
+  if (playSound) {
+    playNotificationSound(type);
+  }
   
   // Create toast element
   const toast = document.createElement("div");
@@ -245,6 +302,7 @@ export function showToast(options) {
         iconHtml = '<i class="fa-solid fa-triangle-exclamation"></i>';
         break;
       case "error":
+      case "danger":
         iconHtml = '<i class="fa-solid fa-circle-xmark"></i>';
         break;
       default:
