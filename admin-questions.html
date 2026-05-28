@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="css/styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <title data-i18n="compare_lectures">השוואת הרצאות</title>
+  <title data-i18n="manage_questions">ניהול שאלות</title>
 </head>
 <body>
   <header class="topbar">
@@ -28,16 +27,28 @@
       <button class="btn link" data-logout type="button" data-i18n="nav_logout"><i class="fa-solid fa-right-from-bracket"></i> יציאה</button>
     </nav>
   </header>
-  <main class="container page-transition">
+  <main class="container narrow page-transition">
     <section class="page-title">
       <div>
-        <h1><i class="fa-solid fa-trophy"></i> <span data-i18n="compare_lectures">השוואת הרצאות</span></h1>
-        <p data-i18n="compare_lectures_desc">דירוג כל ההרצאות לפי ממוצע הציונים</p>
+        <h1 data-i18n="manage_questions">ניהול שאלות</h1>
+        <p data-i18n="manage_questions_desc">שאלות אלו יופיעו בכל ההרצאות. שינוי כאן ישפיע על כל ההרצאות הקיימות.</p>
       </div>
-      <a class="btn" href="admin.html"><span data-i18n="back_to_admin">חזרה לממשק ניהול</span></a>
     </section>
-    <section id="compareBox"></section>
+    
+    <div id="message" class="message" hidden></div>
+    
+    <div class="panel">
+      <form id="questionsForm">
+        <div id="questionsBox" class="questions-edit"></div>
+        <button type="button" id="addQuestionBtn" class="btn secondary">
+          <i class="fa-solid fa-plus"></i> <span data-i18n="add_question">הוספת שאלה</span>
+        </button>
+        <button type="submit" id="saveBtn" class="btn primary full" style="margin-top: 16px;">
+          <i class="fa-solid fa-save"></i> <span data-i18n="save_questions">שמור שאלות</span>
+        </button>
+      </form>
+    </div>
   </main>
-  <script type="module" src="js/admin-compare.js"></script>
+  <script type="module" src="js/admin-questions.js"></script>
 </body>
 </html>

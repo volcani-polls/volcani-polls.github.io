@@ -1,5 +1,5 @@
 import { db } from "./firebase-init.js";
-import { get, ref, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import { get, ref, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import { $, escapeHtml, formatDate, orderedEntries, requireAdmin, showMessage, wireLogoutButtons } from "./utils.js";
 import { t } from "./i18n.js";
 
@@ -27,6 +27,7 @@ async function renderLectures(lectures) {
         <button class="btn small ${lecture.isOpen ? "secondary" : "primary"}" data-toggle="${escapeHtml(id)}" data-open="${lecture.isOpen ? "0" : "1"}">${lecture.isOpen ? t("close_poll") : t("open_poll")}</button>
         <a class="btn small" href="admin-edit-lecture.html?id=${encodeURIComponent(id)}">${t("edit")}</a>
         <a class="btn small" href="admin-results.html?id=${encodeURIComponent(id)}">${t("nav_results")}</a>
+        <button class="btn small danger" data-delete="${escapeHtml(id)}" data-title="${escapeHtml(lecture.title)}">${t("delete")}</button>
       </div>
     </div>
   `).join("");
@@ -41,6 +42,27 @@ async function renderLectures(lectures) {
       try {
         await update(ref(db, `lectures/${id}`), { isOpen, updatedAt: Date.now() });
         showMessage(message, isOpen ? t("poll_opened_msg") : t("poll_closed_msg"), "success");
+      } catch (err) {
+        console.error(err);
+        showMessage(message, t("action_failed"), "error");
+      }
+    });
+  });
+  
+  // Re-attach event listeners for delete buttons
+  document.querySelectorAll("[data-delete]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.delete;
+      const title = btn.dataset.title;
+      
+      if (!confirm(t("confirm_delete_lecture").replace("{title}", title))) {
+        return;
+      }
+      
+      try {
+        await remove(ref(db, `lectures/${id}`));
+        await remove(ref(db, `votes/${id}`));
+        showMessage(message, t("lecture_deleted_success"), "success");
       } catch (err) {
         console.error(err);
         showMessage(message, t("action_failed"), "error");
