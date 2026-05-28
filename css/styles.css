@@ -216,6 +216,15 @@ input:focus, textarea:focus {
   color: white;
   flex-shrink: 0;
 }
+.logo-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+}
 .logo .logo-text {
   width: auto;
   height: auto;
@@ -225,6 +234,18 @@ input:focus, textarea:focus {
   font-weight: 800;
   font-size: 15px;
   white-space: nowrap;
+  line-height: 1.2;
+}
+.logo .logo-subtitle {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 11px;
+  white-space: nowrap;
+  line-height: 1.2;
 }
 .logo-img {
   width: 32px;
@@ -1015,6 +1036,13 @@ html[dir="ltr"] .vote-status {
   
   .logo .logo-text {
     font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .logo .logo-subtitle {
+    font-size: 9px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

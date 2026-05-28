@@ -1,6 +1,7 @@
 const translations = {
   he: {
     app_title: "מערכת הסקרים - כנס הסטודנטים השישי",
+    app_subtitle: "פותח על ידי המכון להנדסת מערכות חקלאיות וביולוגיות",
     nav_home: "דף הבית",
     nav_logout: "יציאה",
     nav_admin: "ממשק ניהול",
@@ -151,6 +152,7 @@ const translations = {
   },
   en: {
     app_title: "Polls System - 6th Student Conference",
+    app_subtitle: "Developed by the Institute of Agricultural & Biological Systems Engineering",
     nav_home: "Home",
     nav_logout: "Logout",
     nav_admin: "Admin Panel",
