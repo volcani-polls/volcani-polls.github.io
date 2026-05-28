@@ -215,6 +215,16 @@ function getToastContainer() {
   return toastContainer;
 }
 
+function updateToastContainerClass() {
+  if (!toastContainer) return;
+  const hasToasts = toastContainer.querySelectorAll('.toast:not(.hide)').length > 0;
+  if (hasToasts) {
+    toastContainer.classList.add('has-toast');
+  } else {
+    toastContainer.classList.remove('has-toast');
+  }
+}
+
 // Get or create audio context (reuse for better performance)
 function getAudioContext() {
   if (!audioContext) {
@@ -289,6 +299,11 @@ function playNotificationSound(type) {
 }
 
 export function showToast(options) {
+  console.log("showToast called:", options, {
+    lang: document.documentElement.lang,
+    dir: document.documentElement.dir
+  });
+  
   const {
     title = "",
     message = "",
@@ -300,6 +315,14 @@ export function showToast(options) {
 
   const container = getToastContainer();
   
+  // Remove any existing toasts first (only show one at a time)
+  const existingToasts = container.querySelectorAll('.toast');
+  existingToasts.forEach(t => {
+    if (t.parentElement) {
+      t.parentElement.removeChild(t);
+    }
+  });
+  
   // Play sound if enabled
   if (playSound) {
     playNotificationSound(type);
@@ -309,23 +332,23 @@ export function showToast(options) {
   const toast = document.createElement("div");
   toast.className = `toast ${type}`;
   
-  // Determine icon
+  // Determine icon - always use lock icons for poll status
   let iconHtml = "";
   if (icon) {
     iconHtml = icon;
   } else {
     switch (type) {
       case "success":
-        iconHtml = '<i class="fa-solid fa-circle-check"></i>';
+        iconHtml = '<i class="fa-solid fa-lock-open"></i>'; // Open lock for opened poll
+        break;
+      case "warning":
+      case "danger":
+        iconHtml = '<i class="fa-solid fa-lock"></i>'; // Closed lock for closed poll
         break;
       case "info":
         iconHtml = '<i class="fa-solid fa-circle-info"></i>';
         break;
-      case "warning":
-        iconHtml = '<i class="fa-solid fa-triangle-exclamation"></i>';
-        break;
       case "error":
-      case "danger":
         iconHtml = '<i class="fa-solid fa-circle-xmark"></i>';
         break;
       default:
@@ -334,7 +357,9 @@ export function showToast(options) {
   }
   
   toast.innerHTML = `
-    <div class="toast-icon">${iconHtml}</div>
+    <div class="toast-header">
+      <div class="toast-icon">${iconHtml}</div>
+    </div>
     <div class="toast-content">
       ${title ? `<p class="toast-title">${escapeHtml(title)}</p>` : ""}
       ${message ? `<p class="toast-message">${escapeHtml(message)}</p>` : ""}
@@ -345,12 +370,21 @@ export function showToast(options) {
   `;
   
   container.appendChild(toast);
+  updateToastContainerClass();
   
   // Close button handler
   const closeBtn = toast.querySelector(".toast-close");
   closeBtn.addEventListener("click", () => {
     removeToast(toast);
   });
+  
+  // Click backdrop to close
+  const handleBackdropClick = (e) => {
+    if (e.target === container) {
+      removeToast(toast);
+    }
+  };
+  container.addEventListener("click", handleBackdropClick);
   
   // Show toast with animation
   requestAnimationFrame(() => {
@@ -375,5 +409,6 @@ function removeToast(toast) {
     if (toast.parentElement) {
       toast.parentElement.removeChild(toast);
     }
-  }, 400);
+    updateToastContainerClass();
+  }, 300);
 }

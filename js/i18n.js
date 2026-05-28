@@ -68,9 +68,9 @@ const translations = {
     action_failed: "הפעולה נכשלה.",
     poll_opened_msg: "הסקר נפתח להצבעה.",
     poll_closed_msg: "הסקר נסגר להצבעה.",
-    poll_opened_toast_title: "סקר נפתח! 🎉",
+    poll_opened_toast_title: "נפתח להצבעה",
     poll_opened_toast_msg: "הסקר פתוח כעת להצבעה",
-    poll_closed_toast_title: "סקר נסגר",
+    poll_closed_toast_title: "נסגר להצבעה",
     poll_closed_toast_msg: "הסקר נסגר להצבעה",
     new_vote_toast_title: "הצבעה חדשה! 🗳️",
     new_vote_toast_msg: "מישהו הצביע בסקר",
@@ -232,9 +232,9 @@ const translations = {
     action_failed: "Action failed.",
     poll_opened_msg: "The poll has been opened for voting.",
     poll_closed_msg: "The poll has been closed for voting.",
-    poll_opened_toast_title: "Poll Opened! 🎉",
+    poll_opened_toast_title: "Open for Voting",
     poll_opened_toast_msg: "The poll is now open for voting",
-    poll_closed_toast_title: "Poll Closed",
+    poll_closed_toast_title: "Closed for Voting",
     poll_closed_toast_msg: "The poll has been closed for voting",
     new_vote_toast_title: "New Vote! 🗳️",
     new_vote_toast_msg: "Someone voted in the poll",
@@ -569,66 +569,75 @@ function triggerLanguageSwitch(nextLang) {
 
 // Global poll status listener - works on all pages
 function setupGlobalPollStatusListener() {
-  // Only run on pages that are not login/register/index
-  const currentPage = window.location.pathname.split('/').pop();
-  const excludedPages = ['login.html', 'register.html', 'index.html', ''];
-  
-  if (excludedPages.includes(currentPage)) {
-    return;
+  function getCurrentPageName() {
+    const path = window.location.pathname;
+    const lastPart = path.split("/").filter(Boolean).pop() || "";
+    
+    if (!lastPart) return "index.html";
+    if (lastPart.endsWith(".html")) return lastPart;
+    
+    // Support clean URLs, e.g. /voter -> voter.html
+    return `${lastPart}.html`;
   }
   
-  // Get translations before dynamic import
-  const translations = {
-    pollOpenedTitle: t("poll_opened_toast_title"),
-    pollClosedTitle: t("poll_closed_toast_title")
-  };
+  const currentPage = getCurrentPageName();
+  
+  const allowedPages = ["home.html", "voter.html"];
+  
+  if (!allowedPages.includes(currentPage)) {
+    return;
+  }
   
   // Dynamically import Firebase and utils only when needed
   import('./firebase-init.js').then(({ db }) => {
     import('https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js').then(({ ref, onValue }) => {
       import('./utils.js').then(({ showToast }) => {
         
-        let previousStates = {};
+        const previousStates = {};
         
         // Listen to all lectures for status changes
         onValue(ref(db, 'lectures'), (snapshot) => {
           const lectures = snapshot.val() || {};
           
           Object.entries(lectures).forEach(([lectureId, lecture]) => {
+            const currentState = lecture.isOpen === true;
             const previousState = previousStates[lectureId];
             
-            // Only show toast if state actually changed (not on initial load)
-            if (previousState !== undefined && previousState !== lecture.isOpen) {
-              
-              if (lecture.isOpen === true) {
-                // Poll opened - GREEN with sound
+            console.log("Poll status changed:", {
+              lectureId,
+              title: lecture.title,
+              previousState,
+              currentState,
+              lang: document.documentElement.lang,
+              dir: document.documentElement.dir
+            });
+            
+            // לא להציג Toast בטעינה ראשונית
+            if (previousState !== undefined && previousState !== currentState) {
+              if (currentState === true) {
                 showToast({
-                  title: translations.pollOpenedTitle,
-                  message: `${lecture.title}`,
+                  title: t("poll_opened_toast_title"),
+                  message: lecture.title || "",
                   type: "success",
-                  icon: '<i class="fa-solid fa-lock-open"></i>',
                   duration: 5000,
                   playSound: true
                 });
               } else {
-                // Poll closed - RED with sound
                 showToast({
-                  title: translations.pollClosedTitle,
-                  message: `${lecture.title}`,
+                  title: t("poll_closed_toast_title"),
+                  message: lecture.title || "",
                   type: "danger",
-                  icon: '<i class="fa-solid fa-lock"></i>',
                   duration: 5000,
                   playSound: true
                 });
               }
             }
             
-            // Update state
-            previousStates[lectureId] = lecture.isOpen;
+            previousStates[lectureId] = currentState;
           });
         });
         
       }).catch(err => console.warn('Could not load utils for global listener:', err));
-    }).catch(err => console.warn('Could not load Firebase for global listener:', err));
+    }).catch(err => console.warn('Could not load Firebase database for global listener:', err));
   }).catch(err => console.warn('Could not load Firebase init for global listener:', err));
 }
