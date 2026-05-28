@@ -1007,6 +1007,19 @@ html[dir="ltr"] .vote-status {
     padding: 14px 20px !important;
     position: relative;
   }
+  
+  .logo {
+    font-size: 13px;
+    max-width: calc(100% - 60px);
+  }
+  
+  .logo .logo-text {
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
   .hamburger-btn {
     display: flex !important;
   }
