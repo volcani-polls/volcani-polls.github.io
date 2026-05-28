@@ -1,5 +1,5 @@
 import { db } from "./firebase-init.js";
-import { get, ref } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import { get, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import { $, calculateResults, escapeHtml, orderedEntries, requireAdmin, wireLogoutButtons } from "./utils.js";
 import { t } from "./i18n.js";
 
@@ -43,17 +43,7 @@ function triggerConfetti() {
   }, 250);
 }
 
-async function loadComparison() {
-  compareBox.innerHTML = `
-    <div class="spinner-container">
-      <div class="spinner"></div>
-      <p class="spinner-text">${t("loading")}</p>
-    </div>
-  `;
-
-  const lecturesSnap = await get(ref(db, "lectures"));
-  const lectures = lecturesSnap.val() || {};
-
+async function renderComparison(lectures) {
   if (!Object.keys(lectures).length) {
     compareBox.innerHTML = `<div class="empty-state">${t("no_lectures_admin")}</div>`;
     return;
@@ -146,15 +136,33 @@ async function loadComparison() {
     </div>
   `;
 
-  // Trigger confetti for the winner
-  if (lectureResults.length > 0 && lectureResults[0].average > 0) {
+  // Trigger confetti for the winner (only once on initial load)
+  if (!compareBox.dataset.confettiShown && lectureResults.length > 0 && lectureResults[0].average > 0) {
+    compareBox.dataset.confettiShown = "true";
     setTimeout(() => {
       triggerConfetti();
     }, 500);
   }
 }
 
-loadComparison().catch((err) => {
-  console.error(err);
+// Show loading spinner initially
+compareBox.innerHTML = `
+  <div class="spinner-container">
+    <div class="spinner"></div>
+    <p class="spinner-text">${t("loading")}</p>
+  </div>
+`;
+
+// Set up real-time listener for lectures
+onValue(ref(db, "lectures"), async (snapshot) => {
+  try {
+    const lectures = snapshot.val() || {};
+    await renderComparison(lectures);
+  } catch (err) {
+    console.error(err);
+    compareBox.innerHTML = `<div class="message error">${t("lectures_load_error")}</div>`;
+  }
+}, (error) => {
+  console.error(error);
   compareBox.innerHTML = `<div class="message error">${t("lectures_load_error")}</div>`;
 });

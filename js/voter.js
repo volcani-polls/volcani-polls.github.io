@@ -1,6 +1,6 @@
 import { db } from "./firebase-init.js";
-import { get, ref } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
-import { $, escapeHtml, isAdminUser, orderedEntries, requireLogin, wireLogoutButtons } from "./utils.js";
+import { get, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import { $, escapeHtml, isAdminUser, orderedEntries, requireLogin, wireLogoutButtons, showToast } from "./utils.js";
 import { t } from "./i18n.js";
 
 const user = await requireLogin();
@@ -19,16 +19,7 @@ if (await isAdminUser(user).catch(() => false)) {
   adminLink.hidden = false;
 }
 
-async function renderLectures() {
-  list.innerHTML = `
-    <div class="spinner-container">
-      <div class="spinner"></div>
-      <p class="spinner-text">${t("loading_lectures")}</p>
-    </div>
-  `;
-  const lecturesSnap = await get(ref(db, "lectures"));
-  const lectures = lecturesSnap.val() || {};
-
+async function renderLectures(lectures) {
   const rows = [];
   for (const [lectureId, lecture] of orderedEntries(lectures)) {
     const voteSnap = await get(ref(db, `votes/${lectureId}/${user.uid}`)).catch(() => null);
@@ -70,7 +61,59 @@ async function renderLectures() {
   list.innerHTML = rows.join("");
 }
 
-renderLectures().catch((err) => {
-  console.error(err);
+// Show loading spinner initially
+list.innerHTML = `
+  <div class="spinner-container">
+    <div class="spinner"></div>
+    <p class="spinner-text">${t("loading_lectures")}</p>
+  </div>
+`;
+
+// Track previous state for toast notifications
+let previousLectureStates = {};
+
+// Set up real-time listener for lectures
+onValue(ref(db, "lectures"), async (snapshot) => {
+  try {
+    const lectures = snapshot.val() || {};
+    
+    // Check for status changes and show toasts
+    Object.entries(lectures).forEach(([lectureId, lecture]) => {
+      const previousState = previousLectureStates[lectureId];
+      
+      if (previousState !== undefined) {
+        // Poll was opened
+        if (!previousState && lecture.isOpen === true) {
+          showToast({
+            title: t("poll_opened_toast_title"),
+            message: `${lecture.title} - ${t("poll_opened_toast_msg")}`,
+            type: "success",
+            icon: '<i class="fa-solid fa-lock-open"></i>',
+            duration: 5000
+          });
+        }
+        // Poll was closed
+        else if (previousState && lecture.isOpen === false) {
+          showToast({
+            title: t("poll_closed_toast_title"),
+            message: `${lecture.title} - ${t("poll_closed_toast_msg")}`,
+            type: "info",
+            icon: '<i class="fa-solid fa-lock"></i>',
+            duration: 5000
+          });
+        }
+      }
+      
+      // Update state
+      previousLectureStates[lectureId] = lecture.isOpen === true;
+    });
+    
+    await renderLectures(lectures);
+  } catch (err) {
+    console.error(err);
+    list.innerHTML = `<div class="message error">${t("lectures_load_error")}</div>`;
+  }
+}, (error) => {
+  console.error(error);
   list.innerHTML = `<div class="message error">${t("lectures_load_error")}</div>`;
 });

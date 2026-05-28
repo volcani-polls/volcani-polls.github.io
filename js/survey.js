@@ -1,6 +1,6 @@
 import { db } from "./firebase-init.js";
-import { get, ref, set } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
-import { $, escapeHtml, getQueryParam, orderedEntries, ratingLabel, requireLogin, setLoading, showMessage, wireLogoutButtons } from "./utils.js";
+import { get, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import { $, escapeHtml, getQueryParam, orderedEntries, ratingLabel, requireLogin, setLoading, showMessage, wireLogoutButtons, showToast } from "./utils.js";
 import { t } from "./i18n.js";
 
 const user = await requireLogin();
@@ -45,16 +45,50 @@ async function loadSurvey() {
   
   titleEl.textContent = lecture.title || t("nav_voter");
   
-  let statusBadgeHtml = "";
-  if (hasVoted) {
-    statusBadgeHtml = `<span class="badge open" style="margin-inline-start: 12px;"><i class="fa-solid fa-circle-check"></i> ${t("voted_status_check")}</span>`;
-  } else if (isOpen) {
-    statusBadgeHtml = `<span class="badge open" style="margin-inline-start: 12px;"><i class="fa-solid fa-lock-open"></i> ${t("open")}</span>`;
-  } else {
-    statusBadgeHtml = `<span class="badge closed" style="margin-inline-start: 12px;"><i class="fa-solid fa-lock"></i> ${t("closed")}</span>`;
+  function updateStatusBadge(isCurrentlyOpen) {
+    let statusBadgeHtml = "";
+    if (hasVoted) {
+      statusBadgeHtml = `<span class="badge open" style="margin-inline-start: 12px;"><i class="fa-solid fa-circle-check"></i> ${t("voted_status_check")}</span>`;
+    } else if (isCurrentlyOpen) {
+      statusBadgeHtml = `<span class="badge open" style="margin-inline-start: 12px;"><i class="fa-solid fa-lock-open"></i> ${t("open")}</span>`;
+    } else {
+      statusBadgeHtml = `<span class="badge closed" style="margin-inline-start: 12px;"><i class="fa-solid fa-lock"></i> ${t("closed")}</span>`;
+    }
+    metaEl.innerHTML = `<i class="fa-solid fa-user-tie"></i> ${t("lecturer")} ${lecture.author || ""} ${statusBadgeHtml}`;
   }
   
-  metaEl.innerHTML = `<i class="fa-solid fa-user-tie"></i> ${t("lecturer")} ${lecture.author || ""} ${statusBadgeHtml}`;
+  updateStatusBadge(isOpen);
+  
+  // Set up real-time listener for status changes
+  let hasShownClosedToast = false;
+  onValue(ref(db, `lectures/${lectureId}/isOpen`), (snapshot) => {
+    const currentlyOpen = snapshot.val() === true;
+    updateStatusBadge(currentlyOpen);
+    
+    // If poll was closed while user is viewing it (and hasn't voted yet)
+    if (!hasVoted && !currentlyOpen && !form.hidden && !hasShownClosedToast) {
+      hasShownClosedToast = true;
+      showMessage(message, t("poll_closed_realtime"), "info");
+      form.hidden = true;
+      
+      // Show toast notification
+      showToast({
+        title: t("poll_closed_toast_title"),
+        message: lecture.title,
+        type: "warning",
+        icon: '<i class="fa-solid fa-lock"></i>',
+        duration: 6000
+      });
+      
+      // Add a button to go back to voter page
+      const backButton = document.createElement("a");
+      backButton.href = "voter.html";
+      backButton.className = "btn primary full";
+      backButton.innerHTML = `<i class="fa-solid fa-arrow-right"></i> ${t("back_to_voter")}`;
+      backButton.style.marginTop = "20px";
+      message.parentElement.appendChild(backButton);
+    }
+  });
 
   // Check if user already voted
   if (voteSnap?.exists()) {

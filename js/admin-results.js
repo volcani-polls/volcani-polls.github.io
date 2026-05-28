@@ -1,6 +1,6 @@
 import { db } from "./firebase-init.js";
-import { get, ref } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
-import { $, calculateResults, escapeHtml, getQueryParam, orderedEntries, requireAdmin, wireLogoutButtons } from "./utils.js";
+import { get, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import { $, calculateResults, escapeHtml, getQueryParam, orderedEntries, requireAdmin, wireLogoutButtons, showToast } from "./utils.js";
 import { t } from "./i18n.js";
 
 await requireAdmin();
@@ -158,31 +158,7 @@ function createDistributionChart(canvasId, questionStats) {
   });
 }
 
-async function loadResults() {
-  if (!lectureId) {
-    resultsBox.innerHTML = `<div class="message error">${t("missing_poll_id")}</div>`;
-    return;
-  }
-
-  resultsBox.innerHTML = `
-    <div class="spinner-container">
-      <div class="spinner"></div>
-      <p class="spinner-text">${t("loading")}</p>
-    </div>
-  `;
-
-  const [lectureSnap, votesSnap] = await Promise.all([
-    get(ref(db, `lectures/${lectureId}`)),
-    get(ref(db, `votes/${lectureId}`)).catch(() => null)
-  ]);
-
-  if (!lectureSnap.exists()) {
-    resultsBox.innerHTML = `<div class="message error">${t("poll_not_found")}</div>`;
-    return;
-  }
-
-  const lecture = lectureSnap.val();
-  const votes = votesSnap?.val() || {};
+async function renderResults(lecture, votes) {
   const stats = calculateResults(lecture, votes);
 
   titleEl.textContent = lecture.title;
@@ -245,7 +221,54 @@ async function loadResults() {
   }, 100);
 }
 
-loadResults().catch((err) => {
-  console.error(err);
-  resultsBox.innerHTML = `<div class="message error">${t("lectures_load_error")}</div>`;
-});
+if (!lectureId) {
+  resultsBox.innerHTML = `<div class="message error">${t("missing_poll_id")}</div>`;
+} else {
+  // Show loading spinner initially
+  resultsBox.innerHTML = `
+    <div class="spinner-container">
+      <div class="spinner"></div>
+      <p class="spinner-text">${t("loading")}</p>
+    </div>
+  `;
+
+  // Load lecture data first
+  const lectureSnap = await get(ref(db, `lectures/${lectureId}`));
+  
+  if (!lectureSnap.exists()) {
+    resultsBox.innerHTML = `<div class="message error">${t("poll_not_found")}</div>`;
+  } else {
+    const lecture = lectureSnap.val();
+    
+    // Track previous vote count for toast notifications
+    let previousVoteCount = 0;
+    
+    // Set up real-time listener for votes
+    onValue(ref(db, `votes/${lectureId}`), async (snapshot) => {
+      try {
+        const votes = snapshot.val() || {};
+        const currentVoteCount = Object.keys(votes).length;
+        
+        // Show toast if new vote arrived (but not on initial load)
+        if (previousVoteCount > 0 && currentVoteCount > previousVoteCount) {
+          showToast({
+            title: t("new_vote_toast_title"),
+            message: `${lecture.title} - ${t("new_vote_toast_msg")}`,
+            type: "success",
+            icon: '<i class="fa-solid fa-square-poll-vertical"></i>',
+            duration: 3000
+          });
+        }
+        
+        previousVoteCount = currentVoteCount;
+        await renderResults(lecture, votes);
+      } catch (err) {
+        console.error(err);
+        resultsBox.innerHTML = `<div class="message error">${t("lectures_load_error")}</div>`;
+      }
+    }, (error) => {
+      console.error(error);
+      resultsBox.innerHTML = `<div class="message error">${t("lectures_load_error")}</div>`;
+    });
+  }
+}

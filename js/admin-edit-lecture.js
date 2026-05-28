@@ -1,5 +1,5 @@
 import { db } from "./firebase-init.js";
-import { get, push, ref, set, update } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
+import { get, push, ref, set, update, onValue } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
 import { $, escapeHtml, getQueryParam, orderedEntries, requireAdmin, setLoading, showMessage, wireLogoutButtons } from "./utils.js";
 import { t } from "./i18n.js";
 
@@ -74,6 +74,15 @@ async function loadLecture() {
 
   orderedEntries(lecture.questions || {}).forEach(([, q]) => addQuestionRow(q.text, q.order));
   if (!questionsBox.children.length) addQuestionRow("", 1);
+  
+  // Set up real-time listener for status changes
+  onValue(ref(db, `lectures/${lectureId}/isOpen`), (snapshot) => {
+    const isOpen = snapshot.val() === true;
+    if ($("#isOpen").checked !== isOpen) {
+      $("#isOpen").checked = isOpen;
+      updateStatusIndicator();
+    }
+  });
 }
 
 addQuestionBtn.addEventListener("click", () => addQuestionRow());

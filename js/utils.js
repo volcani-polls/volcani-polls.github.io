@@ -201,3 +201,98 @@ export function ratingLabel(value) {
   if (value === 5) return t("rating_high");
   return String(value);
 }
+
+// Toast notification system
+let toastContainer = null;
+
+function getToastContainer() {
+  if (!toastContainer) {
+    toastContainer = document.createElement("div");
+    toastContainer.className = "toast-container";
+    document.body.appendChild(toastContainer);
+  }
+  return toastContainer;
+}
+
+export function showToast(options) {
+  const {
+    title = "",
+    message = "",
+    type = "info", // success, info, warning, error
+    duration = 4000,
+    icon = null
+  } = options;
+
+  const container = getToastContainer();
+  
+  // Create toast element
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  
+  // Determine icon
+  let iconHtml = "";
+  if (icon) {
+    iconHtml = icon;
+  } else {
+    switch (type) {
+      case "success":
+        iconHtml = '<i class="fa-solid fa-circle-check"></i>';
+        break;
+      case "info":
+        iconHtml = '<i class="fa-solid fa-circle-info"></i>';
+        break;
+      case "warning":
+        iconHtml = '<i class="fa-solid fa-triangle-exclamation"></i>';
+        break;
+      case "error":
+        iconHtml = '<i class="fa-solid fa-circle-xmark"></i>';
+        break;
+      default:
+        iconHtml = '<i class="fa-solid fa-bell"></i>';
+    }
+  }
+  
+  toast.innerHTML = `
+    <div class="toast-icon">${iconHtml}</div>
+    <div class="toast-content">
+      ${title ? `<p class="toast-title">${escapeHtml(title)}</p>` : ""}
+      ${message ? `<p class="toast-message">${escapeHtml(message)}</p>` : ""}
+    </div>
+    <button class="toast-close" aria-label="Close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  `;
+  
+  container.appendChild(toast);
+  
+  // Close button handler
+  const closeBtn = toast.querySelector(".toast-close");
+  closeBtn.addEventListener("click", () => {
+    removeToast(toast);
+  });
+  
+  // Show toast with animation
+  requestAnimationFrame(() => {
+    toast.classList.add("show");
+  });
+  
+  // Auto-hide after duration
+  if (duration > 0) {
+    setTimeout(() => {
+      removeToast(toast);
+    }, duration);
+  }
+  
+  return toast;
+}
+
+function removeToast(toast) {
+  toast.classList.remove("show");
+  toast.classList.add("hide");
+  
+  setTimeout(() => {
+    if (toast.parentElement) {
+      toast.parentElement.removeChild(toast);
+    }
+  }, 400);
+}
