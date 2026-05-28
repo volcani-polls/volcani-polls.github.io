@@ -1,6 +1,6 @@
 import { db } from "./firebase-init.js";
 import { get, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js";
-import { $, escapeHtml, isAdminUser, orderedEntries, requireLogin, wireLogoutButtons, showToast } from "./utils.js";
+import { $, escapeHtml, isAdminUser, orderedEntries, requireLogin, wireLogoutButtons } from "./utils.js";
 import { t } from "./i18n.js";
 
 const user = await requireLogin();
@@ -69,47 +69,10 @@ list.innerHTML = `
   </div>
 `;
 
-// Track previous state for toast notifications
-let previousLectureStates = {};
-
 // Set up real-time listener for lectures
 onValue(ref(db, "lectures"), async (snapshot) => {
   try {
     const lectures = snapshot.val() || {};
-    
-    // Check for status changes and show toasts
-    Object.entries(lectures).forEach(([lectureId, lecture]) => {
-      const previousState = previousLectureStates[lectureId];
-      
-      if (previousState !== undefined) {
-        // Poll was opened - GREEN
-        if (!previousState && lecture.isOpen === true) {
-          showToast({
-            title: t("poll_opened_toast_title"),
-            message: `${lecture.title} - ${t("poll_opened_toast_msg")}`,
-            type: "success",
-            icon: '<i class="fa-solid fa-lock-open"></i>',
-            duration: 5000,
-            playSound: true
-          });
-        }
-        // Poll was closed - RED
-        else if (previousState && lecture.isOpen === false) {
-          showToast({
-            title: t("poll_closed_toast_title"),
-            message: `${lecture.title} - ${t("poll_closed_toast_msg")}`,
-            type: "danger",
-            icon: '<i class="fa-solid fa-lock"></i>',
-            duration: 5000,
-            playSound: true
-          });
-        }
-      }
-      
-      // Update state
-      previousLectureStates[lectureId] = lecture.isOpen === true;
-    });
-    
     await renderLectures(lectures);
   } catch (err) {
     console.error(err);

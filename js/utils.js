@@ -204,6 +204,7 @@ export function ratingLabel(value) {
 
 // Toast notification system
 let toastContainer = null;
+let audioContext = null;
 
 function getToastContainer() {
   if (!toastContainer) {
@@ -214,51 +215,73 @@ function getToastContainer() {
   return toastContainer;
 }
 
+// Get or create audio context (reuse for better performance)
+function getAudioContext() {
+  if (!audioContext) {
+    try {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    } catch (err) {
+      console.warn("Could not create AudioContext:", err);
+      return null;
+    }
+  }
+  
+  // Resume context if suspended (browser autoplay policy)
+  if (audioContext.state === 'suspended') {
+    audioContext.resume().catch(err => console.warn("Could not resume AudioContext:", err));
+  }
+  
+  return audioContext;
+}
+
 // Play notification sound
 function playNotificationSound(type) {
   try {
-    // Create audio context for better browser support
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
     
     oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    gainNode.connect(ctx.destination);
     
     oscillator.type = 'sine'; // Smooth sine wave
+    
+    const now = ctx.currentTime;
     
     // Different sounds for different types
     if (type === "success") {
       // Happy ascending tone for poll opened (3 notes going up)
-      oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
-      oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.08); // E5
-      oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.16); // G5
+      oscillator.frequency.setValueAtTime(523.25, now); // C5
+      oscillator.frequency.setValueAtTime(659.25, now + 0.08); // E5
+      oscillator.frequency.setValueAtTime(783.99, now + 0.16); // G5
       
-      gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
-      gainNode.gain.setValueAtTime(0.4, audioContext.currentTime + 0.08);
-      gainNode.gain.setValueAtTime(0.4, audioContext.currentTime + 0.16);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+      gainNode.gain.setValueAtTime(0.4, now);
+      gainNode.gain.setValueAtTime(0.4, now + 0.08);
+      gainNode.gain.setValueAtTime(0.4, now + 0.16);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
       
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.4);
+      oscillator.start(now);
+      oscillator.stop(now + 0.4);
     } else if (type === "danger" || type === "error") {
       // Alert descending tone for poll closed (2 notes going down)
-      oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime); // E5
-      oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime + 0.12); // C5
+      oscillator.frequency.setValueAtTime(659.25, now); // E5
+      oscillator.frequency.setValueAtTime(523.25, now + 0.12); // C5
       
-      gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
-      gainNode.gain.setValueAtTime(0.4, audioContext.currentTime + 0.12);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.35);
+      gainNode.gain.setValueAtTime(0.4, now);
+      gainNode.gain.setValueAtTime(0.4, now + 0.12);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
       
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.35);
+      oscillator.start(now);
+      oscillator.stop(now + 0.35);
     } else {
       // Simple beep for other notifications
-      oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.25);
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.25);
+      oscillator.frequency.setValueAtTime(523.25, now); // C5
+      gainNode.gain.setValueAtTime(0.3, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+      oscillator.start(now);
+      oscillator.stop(now + 0.25);
     }
   } catch (err) {
     console.warn("Could not play notification sound:", err);
