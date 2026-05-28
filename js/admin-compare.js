@@ -49,13 +49,17 @@ async function renderComparison(lectures) {
     return;
   }
 
-  // Calculate results for each lecture
+  // Calculate results for each lecture and collect unique voters
   const lectureResults = [];
+  const uniqueVoters = new Set(); // Track unique voter UIDs across all lectures
   
   for (const [lectureId, lecture] of Object.entries(lectures)) {
     const votesSnap = await get(ref(db, `votes/${lectureId}`)).catch(() => null);
     const votes = votesSnap?.val() || {};
     const stats = calculateResults(lecture, votes);
+    
+    // Add all voter UIDs to the set
+    Object.keys(votes).forEach(uid => uniqueVoters.add(uid));
     
     lectureResults.push({
       id: lectureId,
@@ -69,6 +73,9 @@ async function renderComparison(lectures) {
 
   // Sort by average (descending)
   lectureResults.sort((a, b) => b.average - a.average);
+  
+  // Total unique voters across all lectures
+  const totalUniqueVoters = uniqueVoters.size;
 
   // Create ranking cards
   const cards = lectureResults.map((lecture, index) => {
@@ -122,7 +129,7 @@ async function renderComparison(lectures) {
         </div>
         <div class="summary-card">
           <span><i class="fa-solid fa-users"></i> ${t("total_voters") || "סה\"כ מצביעים"}</span>
-          <strong>${lectureResults.reduce((sum, l) => sum + l.votersCount, 0)}</strong>
+          <strong>${totalUniqueVoters}</strong>
         </div>
         <div class="summary-card">
           <span><i class="fa-solid fa-star"></i> ${t("highest_rating") || "דירוג הגבוה ביותר"}</span>
