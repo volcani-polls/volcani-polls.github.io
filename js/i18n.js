@@ -9,7 +9,7 @@ const translations = {
     manage_questions: "ניהול שאלות",
     manage_questions_desc: "שאלות אלו יופיעו בכל ההרצאות. שינוי כאן ישפיע על כל ההרצאות הקיימות.",
     save_questions: "שמור שאלות",
-    questions_saved_success: "השאלות נשמרו בהצלחה וע��דכנו בכל ההרצאות",
+    questions_saved_success: "השאלות נשמרו בהצלחה ועודכנו בכל ההרצאות",
     nav_voter: "עמוד הצבעות",
     nav_results: "תוצאות",
     loading: "טוען...",
