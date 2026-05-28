@@ -243,15 +243,22 @@ function unlockAudio() {
   console.log("Audio unlocked via user gesture");
   
   // Remove listeners after unlock
-  ['touchstart', 'touchend', 'click', 'keydown'].forEach(evt => {
+  ['touchstart', 'touchend', 'mousedown', 'pointerdown', 'click', 'keydown', 'scroll'].forEach(evt => {
     document.removeEventListener(evt, unlockAudio, { capture: true });
   });
 }
 
-// Register unlock listeners as early as possible
-['touchstart', 'touchend', 'click', 'keydown'].forEach(evt => {
+// Register unlock listeners on as many user-gesture events as possible
+const unlockEvents = ['touchstart', 'touchend', 'mousedown', 'pointerdown', 'click', 'keydown', 'scroll'];
+unlockEvents.forEach(evt => {
   document.addEventListener(evt, unlockAudio, { capture: true, once: false, passive: true });
 });
+
+// Also try to unlock when page becomes visible (user switches to tab)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') unlockAudio();
+}, { capture: true });
+
 
 function getToastContainer() {
   if (!toastContainer) {
