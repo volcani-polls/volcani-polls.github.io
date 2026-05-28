@@ -56,6 +56,7 @@ if (admin && roleBadge) {
 }
 if (welcomeSubtitle) {
   welcomeSubtitle.hidden = !admin;
+  welcomeSubtitle.textContent = t("choose_path");
 }
 
 if (actions) {

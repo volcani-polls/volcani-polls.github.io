@@ -165,7 +165,8 @@ export function calculateResults(lecture, votes) {
       order: questions[qid].order ?? 999999,
       sum: 0,
       count: 0,
-      average: null
+      average: null,
+      distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
     };
   });
 
@@ -177,6 +178,7 @@ export function calculateResults(lecture, votes) {
       if (!questionStats[qid] || Number.isNaN(score)) return;
       questionStats[qid].sum += score;
       questionStats[qid].count += 1;
+      questionStats[qid].distribution[score] = (questionStats[qid].distribution[score] || 0) + 1;
       totalSum += score;
       totalCount += 1;
     });

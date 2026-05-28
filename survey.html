@@ -10,14 +10,18 @@
 <body>
   <header class="topbar">
     <a class="logo" href="home.html">
-      <img src="assets/Volcani_W.png" alt="Volcani" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-      <span style="display:none;">V</span> Volcani Polls
+      <img src="assets/Volcani_W.png" alt="Volcani" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+      <span style="display:none;">V</span>
+      <span class="logo-text" data-i18n="app_title">מערכת הסקרים - כנס הסטודנטים השישי</span>
     </a>
+    <button class="hamburger-btn" onclick="this.nextElementSibling.classList.toggle('open')">
+      <i class="fa-solid fa-bars"></i>
+    </button>
     <nav>
       <a href="home.html" data-i18n="nav_home"><i class="fa-solid fa-house"></i> דף הבית</a>
-      <a href="voter.html" data-i18n="nav_voter">עמוד הצבעות</a>
-      <a id="adminLink" href="admin.html" data-i18n="nav_admin" hidden>ממשק ניהול</a>
-      <button class="btn link" data-logout type="button" data-i18n="nav_logout">יציאה</button>
+      <a href="voter.html" data-i18n="nav_voter"><i class="fa-solid fa-square-poll-vertical"></i> עמוד הצבעות</a>
+      <a id="adminLink" href="admin.html" data-i18n="nav_admin" hidden><i class="fa-solid fa-cog"></i> ממשק ניהול</a>
+      <button class="btn link" data-logout type="button" data-i18n="nav_logout"><i class="fa-solid fa-right-from-bracket"></i> יציאה</button>
     </nav>
   </header>
   <main class="container narrow page-transition">

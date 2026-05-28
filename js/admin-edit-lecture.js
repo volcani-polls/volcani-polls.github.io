@@ -14,18 +14,35 @@ const message = $("#message");
 const questionsBox = $("#questionsBox");
 const addQuestionBtn = $("#addQuestionBtn");
 const saveBtn = $("#saveLectureBtn");
+const isOpenCheckbox = $("#isOpen");
+const statusIndicator = $("#pollStatusIndicator");
 
 let currentLectureId = lectureId;
 
 pageTitle.textContent = isNew ? t("add_lecture") : t("edit_lecture");
+
+// Update status indicator when checkbox changes
+isOpenCheckbox.addEventListener("change", updateStatusIndicator);
+
+function updateStatusIndicator() {
+  const isOpen = isOpenCheckbox.checked;
+  const badge = statusIndicator.querySelector(".status-badge");
+  
+  if (isOpen) {
+    badge.className = "status-badge open";
+    badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${t("open")}`;
+  } else {
+    badge.className = "status-badge closed";
+    badge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ${t("closed")}`;
+  }
+}
 
 function addQuestionRow(text = "", order = null) {
   const index = questionsBox.children.length + 1;
   const row = document.createElement("div");
   row.className = "question-edit-row";
   row.innerHTML = `
-    <input class="question-text" type="text" placeholder="${t("question_text_placeholder")}" value="${escapeHtml(text)}" required>
-    <input class="question-order" type="number" min="1" value="${order ?? index}" title="${t("lecture_order_label")}">
+    <input class="question-text" type="text" placeholder="${t("question_text_placeholder")} ${index}..." value="${escapeHtml(text)}" required>
     <button class="btn danger small" type="button">${t("delete")}</button>
   `;
   row.querySelector("button").addEventListener("click", () => row.remove());
@@ -35,9 +52,10 @@ function addQuestionRow(text = "", order = null) {
 async function loadLecture() {
   if (isNew) {
     $("#isOpen").checked = false;
-    addQuestionRow(t("default_q1") || "עד כמה ההרצאה הייתה ברורה?", 1);
-    addQuestionRow(t("default_q2") || "עד כמה הנושא היה רלוונטי עבורך?", 2);
-    addQuestionRow(t("default_q3") || "עד כמה המרצה העביר/ה את התוכן בצורה טובה?", 3);
+    updateStatusIndicator();
+    addQuestionRow("", 1);
+    addQuestionRow("", 2);
+    addQuestionRow("", 3);
     return;
   }
 
@@ -52,6 +70,7 @@ async function loadLecture() {
   $("#author").value = lecture.author || "";
   $("#order").value = lecture.order ?? 1;
   $("#isOpen").checked = lecture.isOpen === true;
+  updateStatusIndicator();
 
   orderedEntries(lecture.questions || {}).forEach(([, q]) => addQuestionRow(q.text, q.order));
   if (!questionsBox.children.length) addQuestionRow("", 1);
@@ -72,7 +91,7 @@ form.addEventListener("submit", async (event) => {
   const questions = {};
   questionRows.forEach((row, idx) => {
     const text = row.querySelector(".question-text").value.trim();
-    const qOrder = Number(row.querySelector(".question-order").value || idx + 1);
+    const qOrder = idx + 1; // Order is based on position in the list
     if (text) {
       const key = `q_${String(idx + 1).padStart(3, "0")}`;
       questions[key] = { text, order: qOrder };

@@ -10,15 +10,20 @@
 <body>
   <header class="topbar">
     <a class="logo" href="home.html">
-      <img src="assets/Volcani_W.png" alt="Volcani" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-      <span style="display:none;">V</span> Volcani Polls
+      <img src="assets/Volcani_W.png" alt="Volcani" class="logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+      <span style="display:none;">V</span>
+      <span class="logo-text" data-i18n="app_title">מערכת הסקרים - כנס הסטודנטים השישי</span>
     </a>
+    <button class="hamburger-btn" onclick="this.nextElementSibling.classList.toggle('open')">
+      <i class="fa-solid fa-bars"></i>
+    </button>
     <nav>
       <a href="home.html" data-i18n="nav_home"><i class="fa-solid fa-house"></i> דף הבית</a>
-      <a href="admin.html" data-i18n="nav_admin">ממשק ניהול</a>
-      <a href="admin-users.html" data-i18n="nav_admin_users">ניהול מנהלים</a>
-      <a href="voter.html" data-i18n="nav_voter">עמוד הצבעות</a>
-      <button class="btn link" data-logout type="button" data-i18n="nav_logout">יציאה</button>
+      <a href="admin.html" data-i18n="nav_admin"><i class="fa-solid fa-cog"></i> ממשק ניהול</a>
+      <a href="admin-compare.html" data-i18n="compare_lectures"><i class="fa-solid fa-trophy"></i> השוואת הרצאות</a>
+      <a href="admin-users.html" data-i18n="nav_admin_users"><i class="fa-solid fa-user-shield"></i> ניהול מנהלים</a>
+      <a href="voter.html" data-i18n="nav_voter"><i class="fa-solid fa-square-poll-vertical"></i> עמוד הצבעות</a>
+      <button class="btn link" data-logout type="button" data-i18n="nav_logout"><i class="fa-solid fa-right-from-bracket"></i> יציאה</button>
     </nav>
   </header>
   <main class="container narrow page-transition">
@@ -34,21 +39,27 @@
 
     <form id="lectureForm" class="form panel">
       <label>
-        <span data-i18n="lecture_title_label">נושא ההרצאה</span>
+        <span data-i18n="lecture_title_label"><i class="fa-solid fa-presentation"></i> נושא ההרצאה</span>
         <input id="title" type="text" maxlength="200" required>
       </label>
       <label>
-        <span data-i18n="lecture_author_label">שם המרצה</span>
+        <span data-i18n="lecture_author_label"><i class="fa-solid fa-user-tie"></i> שם המרצה</span>
         <input id="author" type="text" maxlength="200" required>
       </label>
       <label>
-        <span data-i18n="lecture_order_label">סדר הצגה</span>
+        <span data-i18n="lecture_order_label"><i class="fa-solid fa-arrow-down-1-9"></i> סדר הצגה</span>
         <input id="order" type="number" min="1" value="1">
       </label>
-      <label class="checkbox-line">
-        <input id="isOpen" type="checkbox">
-        <span data-i18n="open_for_voting">פתח להצבעה</span>
-      </label>
+      
+      <div class="poll-status-section">
+        <label class="checkbox-line">
+          <input id="isOpen" type="checkbox">
+          <span data-i18n="open_for_voting">פתח להצבעה</span>
+        </label>
+        <div id="pollStatusIndicator" class="poll-status-indicator">
+          <span class="status-badge closed" data-i18n="closed">סגור</span>
+        </div>
+      </div>
 
       <div class="section-head">
         <h2 data-i18n="survey_questions">שאלות הסקר</h2>

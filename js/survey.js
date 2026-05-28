@@ -40,8 +40,21 @@ async function loadSurvey() {
   }
 
   const lecture = lectureSnap.val();
+  const isOpen = lecture.isOpen === true;
+  const hasVoted = voteSnap?.exists();
+  
   titleEl.textContent = lecture.title || t("nav_voter");
-  metaEl.textContent = `${t("lecturer")} ${lecture.author || ""}`;
+  
+  let statusBadgeHtml = "";
+  if (hasVoted) {
+    statusBadgeHtml = `<span class="badge open" style="margin-inline-start: 12px;"><i class="fa-solid fa-circle-check"></i> ${t("voted_status_check")}</span>`;
+  } else if (isOpen) {
+    statusBadgeHtml = `<span class="badge open" style="margin-inline-start: 12px;"><i class="fa-solid fa-lock-open"></i> ${t("open")}</span>`;
+  } else {
+    statusBadgeHtml = `<span class="badge closed" style="margin-inline-start: 12px;"><i class="fa-solid fa-lock"></i> ${t("closed")}</span>`;
+  }
+  
+  metaEl.innerHTML = `<i class="fa-solid fa-user-tie"></i> ${t("lecturer")} ${lecture.author || ""} ${statusBadgeHtml}`;
 
   // Check if user already voted
   if (voteSnap?.exists()) {
