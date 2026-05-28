@@ -577,6 +577,12 @@ function setupGlobalPollStatusListener() {
     return;
   }
   
+  // Get translations before dynamic import
+  const translations = {
+    pollOpenedTitle: t("poll_opened_toast_title"),
+    pollClosedTitle: t("poll_closed_toast_title")
+  };
+  
   // Dynamically import Firebase and utils only when needed
   import('./firebase-init.js').then(({ db }) => {
     import('https://www.gstatic.com/firebasejs/10.12.5/firebase-database.js').then(({ ref, onValue }) => {
@@ -597,7 +603,7 @@ function setupGlobalPollStatusListener() {
               if (lecture.isOpen === true) {
                 // Poll opened - GREEN with sound
                 showToast({
-                  title: t("poll_opened_toast_title"),
+                  title: translations.pollOpenedTitle,
                   message: `${lecture.title}`,
                   type: "success",
                   icon: '<i class="fa-solid fa-lock-open"></i>',
@@ -607,7 +613,7 @@ function setupGlobalPollStatusListener() {
               } else {
                 // Poll closed - RED with sound
                 showToast({
-                  title: t("poll_closed_toast_title"),
+                  title: translations.pollClosedTitle,
                   message: `${lecture.title}`,
                   type: "danger",
                   icon: '<i class="fa-solid fa-lock"></i>',
