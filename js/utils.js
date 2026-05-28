@@ -205,6 +205,53 @@ export function ratingLabel(value) {
 // Toast notification system
 let toastContainer = null;
 let audioContext = null;
+let audioUnlocked = false;
+
+// Unlock audio on first user interaction (required for mobile browsers)
+function unlockAudio() {
+  if (audioUnlocked) return;
+  
+  // Create/resume AudioContext
+  const ctx = getAudioContext();
+  if (ctx && ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
+  
+  // Play a silent buffer to fully unlock audio on iOS Safari
+  if (ctx) {
+    try {
+      const silentBuffer = ctx.createBuffer(1, 1, 22050);
+      const source = ctx.createBufferSource();
+      source.buffer = silentBuffer;
+      source.connect(ctx.destination);
+      source.start(0);
+    } catch (e) {
+      // Ignore errors from silent playback
+    }
+  }
+  
+  // Also warm up an HTML5 Audio element (fallback path)
+  try {
+    const silentAudio = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=");
+    silentAudio.volume = 0;
+    silentAudio.play().then(() => silentAudio.pause()).catch(() => {});
+  } catch (e) {
+    // Ignore
+  }
+  
+  audioUnlocked = true;
+  console.log("Audio unlocked via user gesture");
+  
+  // Remove listeners after unlock
+  ['touchstart', 'touchend', 'click', 'keydown'].forEach(evt => {
+    document.removeEventListener(evt, unlockAudio, { capture: true });
+  });
+}
+
+// Register unlock listeners as early as possible
+['touchstart', 'touchend', 'click', 'keydown'].forEach(evt => {
+  document.addEventListener(evt, unlockAudio, { capture: true, once: false, passive: true });
+});
 
 function getToastContainer() {
   if (!toastContainer) {
@@ -244,57 +291,154 @@ function getAudioContext() {
   return audioContext;
 }
 
-// Play notification sound
+// Generate a WAV data URI for a simple tone sequence (fallback for when AudioContext fails)
+function generateToneDataURI(frequencies, durations, volume = 0.4) {
+  const sampleRate = 22050;
+  let totalSamples = 0;
+  for (const d of durations) totalSamples += Math.floor(sampleRate * d);
+  
+  const buffer = new ArrayBuffer(44 + totalSamples * 2);
+  const view = new DataView(buffer);
+  
+  // WAV header
+  const writeStr = (offset, str) => { for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i)); };
+  writeStr(0, 'RIFF');
+  view.setUint32(4, 36 + totalSamples * 2, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true); // PCM
+  view.setUint16(22, 1, true); // mono
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeStr(36, 'data');
+  view.setUint32(40, totalSamples * 2, true);
+  
+  let offset = 44;
+  for (let n = 0; n < frequencies.length; n++) {
+    const freq = frequencies[n];
+    const dur = durations[n];
+    const samples = Math.floor(sampleRate * dur);
+    for (let i = 0; i < samples; i++) {
+      const t = i / sampleRate;
+      const fadeOut = Math.max(0, 1 - (i / samples) * 1.5); // fade out envelope
+      const sample = Math.sin(2 * Math.PI * freq * t) * volume * fadeOut;
+      const intSample = Math.max(-32768, Math.min(32767, Math.floor(sample * 32767)));
+      view.setInt16(offset, intSample, true);
+      offset += 2;
+    }
+  }
+  
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  return 'data:audio/wav;base64,' + btoa(binary);
+}
+
+// Cache generated audio data URIs
+const audioCache = {};
+
+function getAudioForType(type) {
+  if (audioCache[type]) return audioCache[type];
+  
+  let frequencies, durations;
+  if (type === "success") {
+    frequencies = [523.25, 659.25, 783.99]; // C5, E5, G5 ascending
+    durations = [0.08, 0.08, 0.24];
+  } else if (type === "danger" || type === "error") {
+    frequencies = [659.25, 523.25]; // E5, C5 descending
+    durations = [0.12, 0.23];
+  } else {
+    frequencies = [523.25]; // C5 simple beep
+    durations = [0.25];
+  }
+  
+  audioCache[type] = generateToneDataURI(frequencies, durations);
+  return audioCache[type];
+}
+
+// Play notification sound with multiple fallback strategies
 function playNotificationSound(type) {
+  let played = false;
+  
+  // Strategy 1: AudioContext oscillator (best quality)
   try {
     const ctx = getAudioContext();
-    if (!ctx) return;
-    
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-    
-    oscillator.type = 'sine'; // Smooth sine wave
-    
-    const now = ctx.currentTime;
-    
-    // Different sounds for different types
-    if (type === "success") {
-      // Happy ascending tone for poll opened (3 notes going up)
-      oscillator.frequency.setValueAtTime(523.25, now); // C5
-      oscillator.frequency.setValueAtTime(659.25, now + 0.08); // E5
-      oscillator.frequency.setValueAtTime(783.99, now + 0.16); // G5
+    if (ctx && ctx.state === 'running') {
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
       
-      gainNode.gain.setValueAtTime(0.4, now);
-      gainNode.gain.setValueAtTime(0.4, now + 0.08);
-      gainNode.gain.setValueAtTime(0.4, now + 0.16);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
       
-      oscillator.start(now);
-      oscillator.stop(now + 0.4);
-    } else if (type === "danger" || type === "error") {
-      // Alert descending tone for poll closed (2 notes going down)
-      oscillator.frequency.setValueAtTime(659.25, now); // E5
-      oscillator.frequency.setValueAtTime(523.25, now + 0.12); // C5
+      oscillator.type = 'sine';
       
-      gainNode.gain.setValueAtTime(0.4, now);
-      gainNode.gain.setValueAtTime(0.4, now + 0.12);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+      const now = ctx.currentTime;
       
-      oscillator.start(now);
-      oscillator.stop(now + 0.35);
-    } else {
-      // Simple beep for other notifications
-      oscillator.frequency.setValueAtTime(523.25, now); // C5
-      gainNode.gain.setValueAtTime(0.3, now);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-      oscillator.start(now);
-      oscillator.stop(now + 0.25);
+      if (type === "success") {
+        oscillator.frequency.setValueAtTime(523.25, now);
+        oscillator.frequency.setValueAtTime(659.25, now + 0.08);
+        oscillator.frequency.setValueAtTime(783.99, now + 0.16);
+        
+        gainNode.gain.setValueAtTime(0.4, now);
+        gainNode.gain.setValueAtTime(0.4, now + 0.08);
+        gainNode.gain.setValueAtTime(0.4, now + 0.16);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+        
+        oscillator.start(now);
+        oscillator.stop(now + 0.4);
+      } else if (type === "danger" || type === "error") {
+        oscillator.frequency.setValueAtTime(659.25, now);
+        oscillator.frequency.setValueAtTime(523.25, now + 0.12);
+        
+        gainNode.gain.setValueAtTime(0.4, now);
+        gainNode.gain.setValueAtTime(0.4, now + 0.12);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+        
+        oscillator.start(now);
+        oscillator.stop(now + 0.35);
+      } else {
+        oscillator.frequency.setValueAtTime(523.25, now);
+        gainNode.gain.setValueAtTime(0.3, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        oscillator.start(now);
+        oscillator.stop(now + 0.25);
+      }
+      played = true;
     }
   } catch (err) {
-    console.warn("Could not play notification sound:", err);
+    console.warn("AudioContext oscillator failed:", err);
+  }
+  
+  // Strategy 2: HTML5 Audio element with generated WAV (fallback)
+  if (!played) {
+    try {
+      const dataURI = getAudioForType(type);
+      const audio = new Audio(dataURI);
+      audio.volume = 0.5;
+      audio.play().catch(err => {
+        console.warn("HTML5 Audio fallback failed:", err);
+      });
+    } catch (err) {
+      console.warn("Could not create fallback audio:", err);
+    }
+  }
+  
+  // Strategy 3: Vibration API for mobile (always try as additional feedback)
+  try {
+    if (navigator.vibrate) {
+      if (type === "success") {
+        navigator.vibrate([100, 50, 100, 50, 150]); // Ascending pattern
+      } else if (type === "danger" || type === "error") {
+        navigator.vibrate([200, 100, 300]); // Descending/urgent pattern
+      } else {
+        navigator.vibrate(150); // Simple buzz
+      }
+    }
+  } catch (err) {
+    // Vibration API not available, ignore
   }
 }
 
